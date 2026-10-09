@@ -8,6 +8,19 @@ The founder selected **After hours**, **comfortable** spacing, and **quiet** cor
 
 Plain action words, warm confirmations, and more character in the inn language can coexist: make core controls literal and put personality in greetings, empty states, and optional collection names. Guests and a concierge do not imply sharing or AI chat; both remain deferred.
 
+## Latest review — revision 02
+
+The founder rejected the gradient-like atmospheric background and asked for a much simpler interface. The current direction takes precedence over the exploratory treatments below:
+
+- Flat dark greens, stronger uniform analog grain, and restrained orange accents. No glowing gradient blobs.
+- Much less descriptive text on the app screen.
+- Capture, categories, and recents are the primary surface. Remove the sidebar and secondary navigation from the prototype.
+- A compact vertical category wheel supports dragging and flicking before pasting. Tapping, previous/next controls, and arrow/Home/End keyboard controls offer alternatives.
+- The selected wheel category is the next save's destination. Recents can show all chests or the selected chest.
+- Retain large pixel-handwritten accents and generous empty space.
+
+Paste is a reference for polish and clarity, not a visual template to duplicate. The generated lettering is an image study, not yet a usable font family. [Asset prompts and provenance](design-assets.md).
+
 ## Latest inspiration
 
 ![Pixel handwriting reference](../references/pixel-handwriting-reference.png)

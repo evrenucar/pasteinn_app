@@ -2,7 +2,7 @@
 
 A quiet place for links, thoughts, screenshots, and other things worth keeping. Copy it. Paste it inn. Find it when you need it.
 
-**Status:** product discovery. This repository contains a working interview and design-direction preview, not the capture/sync application yet.
+**Status:** product discovery and interactive visual prototypes. This repository contains a landing page, a session-only app preview, and the discovery interview. Durable capture and encrypted sync are not implemented yet.
 
 ## Try the discovery interview
 
@@ -12,7 +12,13 @@ No installation or build is required:
 python3 -m http.server 4173 --bind 127.0.0.1 --directory dist
 ```
 
-Open http://127.0.0.1:4173/. If another preview is already using this port, use 4174.
+Open these routes on the server's port:
+
+- `/landing.html` — landing page, interactive format examples, product intentions, and FAQ.
+- `/concept.html` — simplified app preview with a draggable category wheel, session-only text/link capture, recents, search, category filtering, and two appearances.
+- `/index.html` — original discovery interview, with browser-local saved answers.
+
+If another preview is already using port 4173, use 4174. The current project preview runs on port 4174; the earlier interview remains on port 4173. They have separate browser storage.
 
 The interview includes 20 multi-select questions, editable options, custom answers, three visual directions, source-linked competitor/Reddit research, and a generated brief. Answers are stored in browser local storage and can be copied or downloaded. They are not stored in this repository or automatically synced between devices. Changing the preview origin or port gives it separate browser storage.
 
@@ -37,7 +43,7 @@ The latest inspiration adds subtle analog noise, occasional pixel handwriting, s
 
 ## Project contents
 
-- `dist/` — self-contained discovery interview; these are authored source files, not generated build output.
+- `dist/` — self-contained landing page, app prototype, interview, and assets; these are authored source files, not generated build output.
 - `docs/` — current product and design notes.
 - `references/` — user-supplied visual inspiration, for reference rather than redistribution as product artwork.
 
@@ -45,6 +51,8 @@ The latest inspiration adds subtle analog noise, occasional pixel handwriting, s
 
 ```sh
 node --check dist/app.js
+node --check dist/concept.js
+node --check dist/landing.js
 ```
 
-The discovery UI has been manually checked for multiple selections, option editing, appearance changes, and brief read-back. Production capture, OCR, recording, GitHub sync, authentication, and native clients are not implemented.
+The discovery UI has been manually checked for multiple selections, option editing, appearance changes, and brief read-back. The app preview has been checked for category selection, drag/flick snapping, keyboard alternatives, note capture into the chosen category, filtering, and narrow/wide layouts. Landing-page example switching was checked. Touch-device inertia still needs testing on real phones. Production storage, OCR, recording, GitHub sync, authentication, and native clients are not implemented.
