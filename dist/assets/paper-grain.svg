@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <filter id="paper" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency=".72" numOctaves="2" seed="31" stitchTiles="stitch" result="fine"/>
+    <feColorMatrix in="fine" type="saturate" values="0" result="silver"/>
+    <feTurbulence type="fractalNoise" baseFrequency=".008 .012" numOctaves="2" seed="8" stitchTiles="stitch" result="density"/>
+    <feColorMatrix in="density" type="luminanceToAlpha"/>
+    <feComponentTransfer result="patches"><feFuncA type="table" tableValues="0 0 .22 .8 1"/></feComponentTransfer>
+    <feComposite in="silver" in2="patches" operator="in"/>
+  </filter>
+  <rect width="512" height="512" filter="url(#paper)"/>
+</svg>

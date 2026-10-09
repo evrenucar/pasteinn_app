@@ -1,6 +1,8 @@
 # Paste Inn — first-build scope
 
-Updated 9 October 2026 from the founder's completed [discovery brief](discovery-answers.txt). The answer file is the source of truth; proposed resolutions below are not additional user decisions.
+Updated 9 October 2026. The local-first core and experimental personal sync are now implemented; see [validation](validation.md) for verified behavior and remaining checks.
+
+Originally scoped from the founder's completed [discovery brief](discovery-answers.txt). The answer file is the source of truth; proposed resolutions below are not additional user decisions.
 
 ## Product promise
 
@@ -48,7 +50,7 @@ Export requirements: readable Markdown and JSON, useful original filenames, orig
 
 **Proposed resolution:** encrypt content before uploading it to GitHub, and decrypt only on clients. Plaintext Markdown/JSON is an explicit local export, not a readable remote repository. Search and OCR should run on unlocked client data. Encryption scope should include notes, URLs, titles, tags, OCR output, filenames, and attachments; necessary protocol metadata can still reveal activity and approximate sizes. Do not present this as an implemented or audited security guarantee.
 
-**Still to decide before sync implementation:** recovery and device-unlock experience, encrypted local storage versus an unlocked session cache, token handling, and how permanent purge accounts for other devices and copies. Encryption cannot recall previously exported plaintext or copies another party already holds.
+**Resolved in the working build:** downloadable random recovery key, saved-safe confirmation, the same token/key usable on multiple devices, and session-memory-only credentials. Local browser data remains unencrypted and is explicitly labeled. **Still to decide:** encrypted local storage and how permanent purge accounts for other devices and copies. Encryption cannot recall previously exported plaintext or copies another party already holds.
 
 ## GitHub sync
 
@@ -88,8 +90,12 @@ Sharing and group inns; public profiles and feeds; AI chat; task/calendar/projec
 3. Add encrypted GitHub sync after agreeing on recovery, attachment limits, and purge semantics. Validate offline queues, failure recovery, conflicts, and exports against real multi-device use.
 4. Evaluate native capture conveniences only after the first two-week usage test.
 
-These are engineering slices of the selected scope, not a decision to remove selected capabilities. No production capture, OCR, recording, encryption, or sync is implemented yet; the current code remains the discovery interview.
+These are engineering slices of the selected scope, not a decision to remove selected capabilities. The core web build now implements local capture, English image OCR, media/photo/voice controls, editing, tags, pinning, trash, backup/restore, and experimental encrypted personal GitHub sync. This is not a production security or cross-device validation claim. Reminders, a dedicated revisit view, permanent purge, native clients and shared chests are not implemented.
 
 ## Research context
 
 The interview links official product information and public discussions. Research-informed priorities are dependable search, usable exports, and low capture friction. The Reddit sample is qualitative and time-bound; it is not market validation or a reason to expand the feature set.
+
+## Later founder additions
+
+Custom category icons can be chosen from Lucide or drawn on a pixel canvas. Shared chests should eventually have independent encryption secrets and may use public encrypted storage; repository write credentials must stay separate from shared chest keys. See [shared-chest direction](shared-chests.md). Visual refinement was explicitly paused to prioritize core functionality.

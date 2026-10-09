@@ -1,58 +1,72 @@
 # Paste Inn
 
-A quiet place for links, thoughts, screenshots, and other things worth keeping. Copy it. Paste it inn. Find it when you need it.
+A little space for links, images, thoughts, and loose ends.
 
-**Status:** product discovery and interactive visual prototypes. This repository contains a landing page, a session-only app preview, and the discovery interview. Durable capture and encrypted sync are not implemented yet.
+**Status:** working local-first web build with experimental encrypted GitHub sync. Not deployed to pasteinn.com. Native apps, shared chests, and production security review remain future work.
 
-## Try the discovery interview
-
-No installation or build is required:
+## Run
 
 ```sh
-python3 -m http.server 4173 --bind 127.0.0.1 --directory dist
+python3 -B server.py --port 4174
 ```
 
-Open these routes on the server's port:
+- `http://127.0.0.1:4174/concept.html` — app.
+- `http://127.0.0.1:4174/landing.html` — landing page.
+- `http://127.0.0.1:4174/index.html` — original discovery interview.
 
-- `/landing.html` — landing page, interactive format examples, product intentions, and FAQ.
-- `/concept.html` — simplified app preview with a draggable category wheel, session-only text/link capture, recents, search, category filtering, and two appearances.
-- `/index.html` — original discovery interview, with browser-local saved answers.
+No npm install or build is required. Vendored dependencies and licenses are in `dist/vendor/`. `dist/` contains authored source, not generated output. The Python server is a **loopback-only development preview**, not a production server. A plain static server supports local capture but cannot fetch link metadata.
 
-If another preview is already using port 4173, use 4174. The current project preview runs on port 4174; the earlier interview remains on port 4173. They have separate browser storage.
+## Save and retrieve
 
-The interview includes 20 multi-select questions, editable options, custom answers, three visual directions, source-linked competitor/Reddit research, and a generated brief. Answers are stored in browser local storage and can be copied or downloaded. They are not stored in this repository or automatically synced between devices. Changing the preview origin or port gives it separate browser storage.
+Paste a note, URL, or clipboard image; drag in a file; or use **＋**. Pick a category and press **Paste inn** (Cmd/Ctrl+Enter). Saves commit to IndexedDB before reporting success. Categories use localStorage. Data belongs to the browser origin: changing host or port creates a separate store; clearing browser data removes it.
 
-## Working direction
+- Images: thumbnails, original-file download, automatic local English OCR and searchable recognized text.
+- Links: non-blocking title/domain/thumbnail previews, an original-link fallback, duplicate recognition, and an optional note/screenshot.
+- Media: images up to 20 MB; audio/video up to 50 MB; up to eight attachments per save. Audio/video play in the detail view when the browser supports their codec.
+- Photo input invokes the camera on supporting mobile browsers. Voice recording uses a permission prompt and a five-minute cap.
+- Open a save to edit its title, note, category, or tags; pin it; exclude it from sync; or move it to recoverable trash. Filters include dates, pinned saves, and trash.
+- Categories include To do, custom names/colors, 1,800+ bundled Lucide icons, and a 16×16 hand-drawn icon editor with eraser and undo.
 
-- One simple personal capture inbox, with quick saving and dependable retrieval.
-- Full vision: links, short notes, images with OCR, voice recordings, photos, and video.
-- Start with a clean web experience; prioritize native iOS, Android, and desktop capture based on actual needs.
-- Explore optional synchronization through the user's private GitHub repository using a repository URL and a narrowly scoped token.
-- Keep sharing and group inns in future work.
-- Maintain portability and a replaceable storage layer. Media limits, conflicts, offline saves, and token handling need design before implementation.
+The app shell is cached by a service worker after the first online visit. OCR engine/model files cache on first use. A manifest supplies standalone-app metadata and a GET text/link share target where supported. Install/share integration, camera, microphone, and codecs still need real-device verification. Native background clipboard logging is not implemented.
 
-The source-code repository is separate from each user's eventual private content repository. Never commit tokens, personal saved content, or browser answer data here.
+## Backups
 
-## Design direction
+Open the storage icon → **Export backup**. The ZIP includes `pasteinn.json`, readable Markdown in `notes/`, and original locally available attachments in `attachments/`. **Restore backup** validates and merges it; divergent revisions become separate copies. Backups contain plaintext and no GitHub token or encryption recovery key. Keep them somewhere safe.
 
-See [the completed discovery answers](docs/discovery-answers.txt), [the design notes](docs/design-direction.md), and [first-build scope](docs/product-scope.md).
+Browser persistent-storage permission is optional and is not a backup guarantee. Exports are capped at 190 MB to stay inside the import limit; larger libraries need individual attachment downloads until streaming archives are implemented. Imported archives are capped at 200 MB expanded, with a 60 MB per-file cap and 20 MB manifest cap in this first implementation. Local media received through sync may be a compressed image or an unavailable-original placeholder; export originals from the capture device.
 
-The selected direction is an installable web app, After hours styling, and end-to-end encrypted optional sync. The scope document distinguishes confirmed requirements from proposed resolutions for exports, media storage, and recovery.
+## Optional private GitHub sync
 
-The latest inspiration adds subtle analog noise, occasional pixel handwriting, simple icons and categories, and possible “chests” for collections. These are exploratory directions rather than approved final UI decisions. The existing three theme previews predate that reference.
+Storage → **Connect GitHub**:
 
-## Project contents
+1. Create a separate private content repository. Do not use this source repository.
+2. Create a fine-grained token scoped to that repository with **Contents: read and write**.
+3. Create/download a recovery key, save it somewhere safe, and confirm that you have done so.
+4. Connect. On another device enter the same repo, token, and recovery key.
 
-- `dist/` — self-contained landing page, app prototype, interview, and assets; these are authored source files, not generated build output.
-- `docs/` — current product and design notes.
-- `references/` — user-supplied visual inspiration, for reference rather than redistribution as product artwork.
+The token and key stay only in the open page's memory. Reloading requires unlocking again; the non-secret repo name and last-success time are remembered. AES-256-GCM encrypts the entire sync payload before GitHub receives it. Local browser data and exports remain unencrypted. There is no recovery-key reset.
+
+Sync includes notes, URLs, metadata, OCR text, categories, and small images. Images over 512 KB are converted to WebP with a 1,600 px maximum edge, then capped at 2 MB each. Originals are retained locally. Audio/video bytes remain on their capture device. The encrypted vault file has an early 20 MB cap; capacity or network errors leave local saves intact and show an explicit failure.
+
+The implementation fetches and merges revisions, retries conditional-write conflicts, preserves concurrent edits, queues changes while the page is open, retries when connectivity returns, and avoids uploading unchanged revisions. Opening/unlocking another device fetches its remote changes. GitHub history is not purged by moving an item to trash or marking it device-only.
+
+This is **experimental, unaudited encryption/sync code**. Automated tests use a mocked GitHub transport; no real user content repository has been connected during development. See [storage protocol](docs/storage-protocol.md) and [validation](docs/validation.md).
 
 ## Validation
 
 ```sh
-node --check dist/app.js
-node --check dist/concept.js
-node --check dist/landing.js
+node --test tests/*.test.cjs
+python3 -B tests/server_test.py
 ```
 
-The discovery UI has been manually checked for multiple selections, option editing, appearance changes, and brief read-back. The app preview has been checked for category selection, drag/flick snapping, keyboard alternatives, note capture into the chosen category, filtering, and narrow/wide layouts. Landing-page example switching was checked. Touch-device inertia still needs testing on real phones. Production storage, OCR, recording, GitHub sync, authentication, and native clients are not implemented.
+Node 20+ with Web Crypto and Python 3.11+ are suitable for the test suite. The app itself uses standard browser APIs.
+
+## Product/design references
+
+- [Founder discovery answers](docs/discovery-answers.txt)
+- [Scope and deferred work](docs/product-scope.md)
+- [Design direction](docs/design-direction.md)
+- [Generated asset provenance](docs/design-assets.md)
+- [Future shared chests](docs/shared-chests.md)
+
+Never commit tokens, recovery keys, private captures, or exported personal backups into this source repository.

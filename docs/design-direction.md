@@ -69,3 +69,7 @@ Preserve the headline exactly: “Your mind has a lot of tabs open. Give it a li
 Use warmer yellow-green panels and pale-yellow accents against the flat dark green, with finer, stronger static grain. No animated noise or glowing gradients. A quiet solid olive shape adds background variation.
 
 Add original pixel-handwritten greetings inspired by the playful title-screen idea: “no rush, really.”, “your thoughts can stay.”, and “room for one more.” Pick one on page load; tapping it cycles the messages. The small breathing motion respects reduced-motion preferences. These greetings are original lettering studies, not a copied game asset or a full font.
+
+### Grain correction
+
+The first amplified grain looked too intense and uniformly digital. Use a subtler monochrome texture with broad, irregular density patches: fine speckle varies between sparse and slightly denser areas. Keep it behind content rather than over the text and controls. `dist/assets/paper-grain.svg` is a code-native, static two-scale texture; it is not animated noise or a photograph of paper.
