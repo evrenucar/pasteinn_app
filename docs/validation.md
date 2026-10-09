@@ -9,10 +9,10 @@
 - Repository and record input guards.
 - Mocked GitHub integration: encrypted upload; no persisted tokens/keys; wrong key and public repo cannot write; conditional-write retry preserving both devices' records; exclusion redactions and local media originals; offline state never claims a successful upload.
 
-`python3 -B tests/server_test.py` — 4 passing tests:
+`python3 -B tests/server_test.py` — 5 passing tests:
 
 - Public-address pinning; private/loopback/link-local and mixed DNS rejection.
-- Scheme, credentials, port and control-character rejection.
+- Scheme, credentials, port and control-character rejection. Explicit HTTPS reverse-proxy origins accepted; unrelated origins rejected.
 - Metadata extraction as text.
 
 The mock transport uses inert test tokens and does not contact a real content repository.
@@ -35,3 +35,5 @@ The mock transport uses inert test tokens and does not contact a real content re
 - Storage quota failures on representative mobile browsers and large-library performance.
 - Independent security review, threat modeling, migration/recovery exercises and cryptographic rollback/sender-authenticity design before production claims.
 - Domain deployment, HTTPS metadata-service hosting, native clients, permanent purge and shared chests remain outside this build.
+
+Tailscale follow-up: the HTTPS app and metadata endpoint returned successfully through Serve on port 8443 with normal certificate validation. The pre-existing HTTPS 443 mapping remained intact. This verifies the local tailnet endpoint, not connectivity from an actual second device.

@@ -70,3 +70,21 @@ Node 20+ with Web Crypto and Python 3.11+ are suitable for the test suite. The a
 - [Future shared chests](docs/shared-chests.md)
 
 Never commit tokens, recovery keys, private captures, or exported personal backups into this source repository.
+
+## Cross-device testing with Tailscale
+
+Use the Mac's Tailscale HTTPS hostname for device tests. The current development mapping uses **HTTPS 8443 → local 4174**, preserving the other app on HTTPS 443.
+
+```sh
+tailscale status --json
+tailscale serve status --json
+python3 -B server.py --port 4174 --allowed-origin https://YOUR-MAC.YOUR-TAILNET.ts.net:8443
+# In another terminal, once the server is running:
+tailscale serve --bg --https=8443 http://127.0.0.1:4174
+```
+
+Open `https://YOUR-MAC.YOUR-TAILNET.ts.net:8443/concept.html` from devices connected to the tailnet. The Mac must remain running/awake. Serve is tailnet-only; no public Funnel is enabled. Use the HTTPS hostname rather than a raw HTTP Tailscale IP for [secure browser APIs](https://developer.mozilla.org/en-US/docs/Web/Security/Defenses/Secure_Contexts). [Tailscale Serve reference](https://tailscale.com/docs/reference/tailscale-cli/serve).
+
+This origin has its own browser database. Existing `http://127.0.0.1:4174` saves remain there; export/restore a backup or configure GitHub sync to move them. The local preview server still binds only to loopback; the explicit origin flag allows its metadata endpoint behind the trusted proxy.
+
+To remove only this test mapping when requested: `tailscale serve --https=8443 off`. Do not reset all Serve routes.

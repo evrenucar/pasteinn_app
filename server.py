@@ -129,10 +129,12 @@ class Handler(SimpleHTTPRequestHandler):
         if path.path != '/api/preview':
             return super().do_GET()
         # A custom request header prevents cross-site forms/no-cors reads. No CORS allowed.
-        allowed_hosts = (f'127.0.0.1:{self.server.server_port}', f'localhost:{self.server.server_port}')
+        local_hosts = (f'127.0.0.1:{self.server.server_port}', f'localhost:{self.server.server_port}')
+        allowed_origins = {'http://' + h for h in local_hosts} | getattr(self.server, 'allowed_origins', set())
+        allowed_hosts = set(local_hosts) | {urlsplit(origin).netloc for origin in allowed_origins}
         host = self.headers.get('Host', '')
         origin = self.headers.get('Origin')
-        if host not in allowed_hosts or self.headers.get('X-Paste-Inn') != 'preview' or (origin and origin != 'http://' + host) or self.headers.get('Sec-Fetch-Site') == 'cross-site':
+        if host not in allowed_hosts or self.headers.get('X-Paste-Inn') != 'preview' or (origin and origin not in allowed_origins) or self.headers.get('Sec-Fetch-Site') == 'cross-site':
             return self.reply(403, {'error': 'Same-origin preview requests only'})
         if not SLOTS.acquire(blocking=False):
             return self.reply(429, {'error': 'Try again shortly'})
@@ -163,8 +165,16 @@ class Handler(SimpleHTTPRequestHandler):
 if __name__ == '__main__':
     args = argparse.ArgumentParser()
     args.add_argument('--port', type=int, default=4174)
+    args.add_argument('--allowed-origin', action='append', default=[], help='Explicit HTTPS origin of a trusted local reverse proxy, e.g. Tailscale Serve')
     config = args.parse_args()
+    allowed_origins = set()
+    for origin in config.allowed_origin:
+        parsed = urlsplit(origin)
+        if parsed.scheme != 'https' or not parsed.hostname or parsed.username or parsed.password or parsed.path not in ('', '/') or parsed.query or parsed.fragment:
+            args.error('--allowed-origin must be an HTTPS origin without a path, credentials, query or fragment')
+        allowed_origins.add(origin.rstrip('/'))
     root = Path(__file__).resolve().parent / 'dist'
     server = ThreadingHTTPServer(('127.0.0.1', config.port), functools.partial(Handler, directory=str(root)))
+    server.allowed_origins = allowed_origins
     print(f'Paste Inn: http://127.0.0.1:{config.port}/concept.html', flush=True)
     server.serve_forever()

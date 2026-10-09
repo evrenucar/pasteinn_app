@@ -3,6 +3,7 @@ import pathlib
 import os
 import socket
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 
 spec=importlib.util.spec_from_file_location('server',pathlib.Path(os.environ.get('PASTEINN_ROOT',pathlib.Path(__file__).resolve().parent.parent))/'server.py')
@@ -23,6 +24,17 @@ class PreviewTests(unittest.TestCase):
         with patch.object(socket,'getaddrinfo',return_value=[(socket.AF_INET,socket.SOCK_STREAM,6,'',('93.184.216.34',443))]):
             _,host,port,address=server.public_target('https://example.com/a')
             self.assertEqual((host,port,address),('example.com',443,'93.184.216.34'))
+
+    def test_reverse_proxy_origin_is_explicit(self):
+        for origin,expected in [('https://my-machine.example:8443',200),('https://untrusted.example',403)]:
+            handler=object.__new__(server.Handler)
+            handler.path='/api/preview?url=https%3A%2F%2Fexample.com'
+            handler.headers={'Host':'my-machine.example:8443','Origin':origin,'X-Paste-Inn':'preview','Sec-Fetch-Site':'same-origin'}
+            handler.server=SimpleNamespace(server_port=4174,allowed_origins={'https://my-machine.example:8443'})
+            replies=[]
+            handler.reply=lambda status,value:replies.append(status)
+            with patch.object(server,'preview',return_value={'title':'Example'}):handler.do_GET()
+            self.assertEqual(replies,[expected])
 
     def test_metadata_is_text_not_markup(self):
         parser=server.Metadata();parser.feed('<title>A &amp; B</title><meta property="og:title" content="&lt;script&gt;test&lt;/script&gt;"><meta name="description" content="A description">')
