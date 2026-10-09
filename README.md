@@ -29,7 +29,9 @@ The source-code repository is separate from each user's eventual private content
 
 ## Design direction
 
-See [the design notes](docs/design-direction.md) and [product scope](docs/product-scope.md).
+See [the completed discovery answers](docs/discovery-answers.txt), [the design notes](docs/design-direction.md), and [first-build scope](docs/product-scope.md).
+
+The selected direction is an installable web app, After hours styling, and end-to-end encrypted optional sync. The scope document distinguishes confirmed requirements from proposed resolutions for exports, media storage, and recovery.
 
 The latest inspiration adds subtle analog noise, occasional pixel handwriting, simple icons and categories, and possible “chests” for collections. These are exploratory directions rather than approved final UI decisions. The existing three theme previews predate that reference.
 

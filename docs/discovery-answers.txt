@@ -1,0 +1,146 @@
+PASTE INN — DISCOVERY BRIEF
+Generated from your current answers. Unanswered questions remain open.
+
+WORKING DIRECTION FROM THE CONVERSATION
+A minimal personal capture inbox; explore private GitHub repo URL + token sync. Sharing and group inns are future work. Full vision: links, notes, images/OCR, voice, photos, video, and clients across platforms.
+
+YOUR ANSWERS
+
+THE REASON
+What’s the frustration you most want to fix?
+• I save things and never revisit them
+• Everything is scattered across apps
+• I remember the thing, but can’t find it
+• Organizing takes more effort than saving
+• I send things to myself just to transfer them
+• I don’t trust an app to keep my stuff accessible
+Who should love the first version?
+• Me, built around my own habits
+• Friends who want zero setup
+• People saving everyday life admin
+What would prove it’s useful after two weeks?
+• I stop sending links to myself
+• I find an old save in under 10 seconds
+• I use it on both phone and computer daily
+• I actually use something I saved
+
+THE CAPTURE
+Which formats must work on day one?
+• Links, including reels and YouTube
+• Short text notes
+• Pasted images and screenshots
+• Searchable text inside images (OCR)
+• Taking a photo
+• Uploading existing audio or video
+How should a save enter the inn?
+• Paste into one box
+• Share from another app
+• Drag in a file or image
+• Quick keyboard shortcut on desktop
+• Take a photo inside the app
+• Record a voice note inside the app
+Where must it work first?
+• Responsive web app on all devices
+• Installable web app
+• iPhone app next
+• Android app next
+• Mac desktop app next
+• Windows desktop app next
+How much should it remember automatically?
+• Only what I intentionally paste or share
+• Ask before adding a copied item
+• Optional desktop clipboard history later
+What does “save this reel” need to mean?
+• Keep the original link and my note
+• Show a title and preview when available
+• Let me attach my own screenshot
+• Keep an offline copy when technically permitted
+• A link is enough for the first version
+
+THE RETURN
+How would you look for something a month later?
+• A word I remember
+• Text that was inside a screenshot
+• Roughly when I saved it
+• A visual grid I can browse
+How much organizing should happen without you?
+• Automatic content types only
+• Suggested tags I can correct
+• Optional manual tags
+• No folders required to save
+• Manual folders or collections
+What would bring you back without becoming another chore?
+• Search only, when I need something
+• A small pinned area
+• A quiet “revisit” view inside the app
+• An optional weekly digest later
+• Remind me only when I ask
+• Never send unsolicited notifications
+What should happen when you save the same thing twice?
+• Show me the existing save
+• Suggest merging duplicates later
+
+YOUR OWN INN
+What should the GitHub setup feel like?
+• Paste a private repo URL and token
+• Guide me through creating the repo and token
+• Use it locally before connecting GitHub
+What belongs in the repository initially?
+• Notes, links, and metadata
+• Small compressed images
+• Video links plus my notes for now
+What must happen when sync cannot finish?
+• Save locally and retry when online
+• Show the last successful sync
+• Keep both edits if devices conflict
+• Never claim “synced” before confirmation
+What privacy promises are essential?
+• No advertising or analytics by default
+• Prefer OCR and transcription on device
+• End-to-end encryption is a must
+• Exclude sensitive items from sync
+What should leaving Paste Inn look like?
+• Readable Markdown and JSON files
+• Export originals with useful filenames
+• A complete downloadable archive
+• A documented format another app can read
+• A clear way to permanently purge sensitive history
+
+THE ATMOSPHERE
+How much “inn” should live in the interface?
+• Mostly plain words: Save, Search, Delete
+• Warm empty states and gentle confirmations
+• More character: rooms, guests, a concierge
+What should people be able to personalize?
+• A few curated color themes
+What are you happy to postpone?
+• Sharing and group inns — future work
+• Public profiles and feeds
+• An AI chat assistant
+• Tasks, calendars, and project management
+• Native video capture
+• Always-on desktop clipboard logging
+• Native apps until the web flow proves useful
+
+VISUAL DIRECTION
+After hours — selected by you
+Spacing: comfortable; corners: quiet.
+
+RECOMMENDED STARTING SCOPE — NOT A CONFIRMED DECISION
+One capture box, one inbox, notes/links/images, exact search, editable metadata, export, local saves with optional GitHub sync. Validate OCR priority; choose voice/photo/video scope from your answers. Defer groups, sharing, feeds, task management, and background clipboard logging.
+
+DECISIONS TO RESOLVE
+• GitHub sync: cap attachment size, define conflict recovery, token handling, and permanent deletion.
+• Video/original media is selected: validate a different media store or strict limits before implementation.
+• End-to-end encryption is selected: decide key recovery and how searchable/local readable files should work.
+• Select a first platform and test capture with real items.
+• Measure retrieval and useful reuse, not only total saves.
+
+RESEARCH
+Qualitative scan, 9 October 2026. Reddit reports are anecdotal and time-bound.
+Similar apps: https://mymind.com/ | https://raindrop.io/ | https://pasteapp.io/
+Retrieval: https://www.reddit.com/r/raindropio/comments/1vf3vy6/search_inconsistencies_and_errors/
+Return: https://www.reddit.com/r/nosurf/comments/1t7eogr/does_anyone_actually_revisit_their_bookmarks_later/
+Ownership: https://www.reddit.com/r/PKMS/comments/1i37b64/undecided_about_buying_mymind/
+Wishlist: https://www.reddit.com/r/mymindapp/comments/1mzrzv7/megathread_feature_wishlist/
+GitHub: https://docs.github.com/en/rest/repos/contents

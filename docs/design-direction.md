@@ -1,6 +1,12 @@
 # Paste Inn — design direction
 
-Updated 9 October 2026. Exploratory notes from the founder, not a final specification.
+Updated 9 October 2026. Includes the completed discovery answers and exploratory inspiration.
+
+## Selected foundation
+
+The founder selected **After hours**, **comfortable** spacing, and **quiet** corners. Curated color themes are the requested customization scope. Use this dark, warm foundation for the first product design. Keep the following reference-driven treatments exploratory until they are seen in a concrete interface.
+
+Plain action words, warm confirmations, and more character in the inn language can coexist: make core controls literal and put personality in greetings, empty states, and optional collection names. Guests and a concierge do not imply sharing or AI chat; both remain deferred.
 
 ## Latest inspiration
 
@@ -35,10 +41,10 @@ Use a clean, modern utility surface with a small amount of handmade character. L
 2. **Ink & chalk:** near-black surfaces, warm white lettering, sparse hand-drawn accents. Borrow the reference's contrast without roughening normal text.
 3. **Quiet utility:** clean system typography and surfaces; pixel character appears only in the logo and collection icons. The most restrained option.
 
-These are proposed alternatives. The existing interview still previews Hearth, Clear, and After hours; the new reference has been preserved for the next design pass.
+These are reference treatments to explore within the selected After hours direction, not a request to reopen the base-theme decision. The existing interview previews Hearth, Clear, and After hours; the supplied pixel-handwriting reference is preserved for the next product design pass.
 
 ## Interaction principles
 
-Follow platform conventions for navigation, keyboard behavior, readable scalable text, focus, and accessible controls. On Apple platforms, use familiar Apple interaction patterns; on Android, respect Android conventions. Keep the same brand while allowing platform-native behavior. Theme settings should be compact: preset, appearance, density, and optionally texture intensity.
+Follow platform conventions for navigation, keyboard behavior, readable scalable text, focus, and accessible controls. On Apple platforms, use familiar Apple interaction patterns; on Android, respect Android conventions. Keep the same brand while allowing platform-native behavior. Theme settings should begin with a few curated presets. Comfortable spacing and quiet corners are the selected defaults; extra density or texture controls are proposals, not selected product requirements.
 
 “Save,” “Search,” “Edit,” and “Delete” remain plain. The inn metaphor should make the product welcoming without requiring users to learn a fictional vocabulary.
