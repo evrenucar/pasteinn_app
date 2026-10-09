@@ -35,3 +35,22 @@ Exact prompt:
 > Composition/framing: wide landscape, edge-to-edge image; keep central area quiet and very dark for an app interface to overlay.
 > Color palette: predominantly deep forest green, muted olive and near-black, with only one restrained burnt-orange area.
 > Constraints: no objects, text, icons, logos, lettering, border or watermark.
+
+## Cozy title-screen greetings
+
+Generated once each with built-in ImageGen; all 2172 × 724 transparent PNGs. Current assets:
+
+- `dist/assets/cozy-no-rush.png` — `no rush, really.`
+- `dist/assets/cozy-thoughts.png` — `your thoughts can stay.`
+- `dist/assets/cozy-room.png` — `room for one more.`
+
+Exact prompt template used separately for each phrase, substituting `{phrase}` in both locations:
+
+> Use case: logo-brand
+> Asset type: transparent greeting lettering for a cozy app landing page, intended to sit small and slightly angled beside a large headline.
+> Primary request: render exactly "{phrase}" in a single line of original fine hand-drawn stepped-pixel handwriting.
+> Text (verbatim): "{phrase}"
+> Style/medium: relaxed irregular human handwritten lowercase lettering built from small square pixel steps; fine strokes, airy open letterforms, imperfect baseline and charming subtle asymmetry. Cozy and understated, inspired by the feel of a rotating game title-screen greeting.
+> Color palette: uniform warm pale yellow #e5d58a.
+> Composition/framing: one complete single line, horizontal lettering with generous transparent margins so no glyph or punctuation is clipped.
+> Constraints: clean actual transparent background with alpha. Only the exact phrase and its punctuation. NOT conventional arcade block lettering, not a rigid pixel font. No surrounding shapes, no texture speckles, no drop shadow, no glow, no gradient, no background, no watermark.

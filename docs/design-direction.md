@@ -61,3 +61,11 @@ These are reference treatments to explore within the selected After hours direct
 Follow platform conventions for navigation, keyboard behavior, readable scalable text, focus, and accessible controls. On Apple platforms, use familiar Apple interaction patterns; on Android, respect Android conventions. Keep the same brand while allowing platform-native behavior. Theme settings should begin with a few curated presets. Comfortable spacing and quiet corners are the selected defaults; extra density or texture controls are proposals, not selected product requirements.
 
 “Save,” “Search,” “Edit,” and “Delete” remain plain. The inn metaphor should make the product welcoming without requiring users to learn a fictional vocabulary.
+
+## Landing-page refinement — revision 03
+
+Preserve the headline exactly: “Your mind has a lot of tabs open. Give it a little space.” Reduce descriptive copy across the site and increase empty space. The landing page now uses a short interactive capture example, concise ownership heading, and three collapsed questions instead of long feature sections.
+
+Use warmer yellow-green panels and pale-yellow accents against the flat dark green, with finer, stronger static grain. No animated noise or glowing gradients. A quiet solid olive shape adds background variation.
+
+Add original pixel-handwritten greetings inspired by the playful title-screen idea: “no rush, really.”, “your thoughts can stay.”, and “room for one more.” Pick one on page load; tapping it cycles the messages. The small breathing motion respects reduced-motion preferences. These greetings are original lettering studies, not a copied game asset or a full font.
