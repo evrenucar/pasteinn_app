@@ -2,3 +2,5 @@
 
 .pixel-arrow{width:36px;height:36px;transform:rotate(5deg);flex:none}.button.orange{gap:17px}
 .pixel-arrow{fill:currentColor;stroke:none}
+
+.site-nav>button{display:inline-flex;align-items:center;gap:10px}.pixel-palette{width:27px;height:27px;stroke:none;flex:none;transform:rotate(-5deg)}.pixel-arrow{transform:rotate(4deg)}
