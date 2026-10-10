@@ -6,8 +6,10 @@ dialog{width:calc(100% - 32px);max-width:580px;max-height:88dvh;overflow:auto;ba
 @media(max-width:480px){dialog{padding:24px}dialog h2{font-size:34px}.range-row{grid-template-columns:65px 1fr 30px;gap:7px}.patch-colors label{font-size:18px}.card-toggles{gap:0 8px}.wordmark-image{width:134px;height:46px}.inn-grain{opacity:.8}}
 
 /* Paper stays visible while its controls are open. */
-#appearance-dialog{position:fixed;inset:12px 12px 12px auto;margin:0;width:min(390px,calc(100% - 32px));max-width:none;max-height:none;height:calc(100dvh - 24px);padding:24px;box-shadow:-12px 0 40px #0003;border-radius:12px;animation:paper-drawer-in .22s ease-out}
-#appearance-dialog::backdrop{background:transparent;backdrop-filter:none}
+#appearance-dialog,#category-editor{position:fixed;inset:12px 12px 12px auto;margin:0;width:min(390px,calc(100% - 32px));max-width:none;max-height:none;height:calc(100dvh - 24px);padding:24px;box-shadow:-12px 0 40px #0003;border-radius:12px;animation:paper-drawer-in .22s ease-out}
+#appearance-dialog::backdrop,#category-editor::backdrop{background:transparent;backdrop-filter:none}
 @keyframes paper-drawer-in{from{transform:translateX(35px);opacity:0}to{transform:translateX(0);opacity:1}}
-@media(max-width:600px){#appearance-dialog{inset:auto 8px 8px auto;width:min(350px,calc(100% - 32px));height:68dvh;padding:20px;max-height:68dvh}}
-@media(prefers-reduced-motion:reduce){#appearance-dialog{animation:none}}
+@media(max-width:600px){#appearance-dialog,#category-editor{inset:auto 8px 8px auto;width:min(350px,calc(100% - 32px));height:68dvh;padding:20px;max-height:68dvh}}
+@media(prefers-reduced-motion:reduce){#appearance-dialog,#category-editor{animation:none}}
+
+.appearance-scope-row{position:sticky;top:-24px;background:#1d2922;z-index:2;padding:12px 0;margin-top:0!important}
