@@ -125,3 +125,5 @@
 .recents-toolbar .search input::placeholder{color:var(--quiet);opacity:.62;font-size:18px}
 @media(max-width:800px){.recents-toolbar{flex-wrap:wrap}.recents-toolbar .recents-title{width:100%}.recents-toolbar .search{margin-left:0;flex:1 1 240px}.recents-toolbar #filter-options{flex:none;margin-left:auto}}
 @media(max-width:380px){#filters{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}#filters select{font-size:18px;padding-left:9px}.recents-toolbar .search{flex:1 1 180px}.recents-toolbar .search input,.recents-toolbar .search input::placeholder{font-size:16px}}
+
+dialog .dialog-close{z-index:5;display:grid;place-items:center;top:8px;right:8px;width:36px;height:36px;min-width:36px;min-height:36px;padding:8px;color:var(--muted);background:var(--surface);border-radius:5px}dialog .dialog-close svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.8;fill:none}dialog .dialog-close:hover{color:var(--text);background:color-mix(in srgb,var(--surface) 90%,var(--text))}.image-stage{overscroll-behavior:contain}.image-stage img{pointer-events:none}
