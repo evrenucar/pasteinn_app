@@ -19,12 +19,12 @@
   }
   const rgb=c=>c.slice(1).match(/../g).map(v=>parseInt(v,16));
   let palette=[rgb(current.base),...current.colors.map(rgb)],geometrySeed=current.seed,nextSeed=current.seed,seedBlend=1;
-  function paintShapes(seed,b,alpha,moving){const rand=random(seed);for(let i=0;i<11;i++){const cx=(rand()-.5)*b.spread*3.8+b.x*2.2,cy=(rand()-.5)*b.spread*2.4+b.y*1.5,width=35+rand()*180,height=6+rand()*37,tilt=(rand()-.5)*1.3;ctx.save();ctx.translate(cx+(moving?Math.sin(phase+i)*16:0),cy+(moving?Math.cos(phase*.6+i)*10:0));ctx.rotate(tilt+(moving?Math.sin(phase*.4+i)*.035:0));ctx.globalAlpha=alpha*b.coverage/100*(.19+rand()*.55);ctx.fillStyle='rgb('+palette[1+i%3].join(',')+')';ctx.filter='blur(1.3px)';ctx.beginPath();ctx.moveTo(-width/2,-height*.4);ctx.lineTo(-width*.12,-height*.7);ctx.lineTo(width*.54,-height*.2);ctx.lineTo(width*.43,height*.6);ctx.lineTo(-width*.33,height*.4);ctx.closePath();ctx.fill();ctx.restore()}}
+  function paintShapes(seed,b,alpha,moving){const rand=random(seed);for(let i=0;i<11;i++){const cx=(rand()-.5)*b.spread*3.8+b.x*2.2,cy=(rand()-.5)*b.spread*2.4+b.y*1.5,width=35+rand()*180,height=6+rand()*37,tilt=(rand()-.5)*1.3;ctx.save();ctx.translate(cx+(moving?Math.sin(phase+i)*22:0),cy+(moving?Math.cos(phase*.6+i)*16:0));ctx.rotate(tilt+(moving?Math.sin(phase*.4+i)*.035:0));ctx.globalAlpha=alpha*b.coverage/100*(.19+rand()*.55);ctx.fillStyle='rgb('+palette[1+i%3].join(',')+')';ctx.filter='blur(1.3px)';ctx.beginPath();ctx.moveTo(-width/2,-height*.4);ctx.lineTo(-width*.12,-height*.7);ctx.lineTo(width*.54,-height*.2);ctx.lineTo(width*.43,height*.6);ctx.lineTo(-width*.33,height*.4);ctx.closePath();ctx.fill();ctx.restore()}}
   function frame(now){requestAnimationFrame(frame);if(document.hidden){last=now;return}const dt=Math.min((now-(last||now))/1000,.08);last=now;const b=preview||target,t=1-Math.exp(-dt*5);
     for(const k of ['coverage','spread','x','y','grain','speed'])current[k]+=(b[k]-current[k])*t;
     const colors=[rgb(b.base),...b.colors.map(rgb)];palette=palette.map((a,i)=>a.map((v,j)=>v+(colors[i][j]-v)*t));
     if(b.seed!==nextSeed){geometrySeed=seedBlend>.5?nextSeed:geometrySeed;nextSeed=b.seed;seedBlend=0}seedBlend=Math.min(1,seedBlend+dt/1.2);
-    const moving=b.motion&&!matchMedia('(prefers-reduced-motion: reduce)').matches;if(moving)phase+=dt*(.015+current.speed*.0025);
+    const moving=b.motion&&!matchMedia('(prefers-reduced-motion: reduce)').matches;if(moving)phase+=dt*(.08+current.speed*.009);
     ctx.fillStyle='rgb('+palette[0].join(',')+')';ctx.fillRect(0,0,220,150);if(seedBlend<1)paintShapes(geometrySeed,current,1-seedBlend,moving);paintShapes(nextSeed,current,seedBlend,moving);
     // Grain remains anchored to the paper; it does not flicker between crates.
     paintNoise({...current,seed:831});document.documentElement.style.setProperty('--inn-base',b.base);
