@@ -56,7 +56,7 @@ $('image-input').onchange=e=>{addImages([...e.target.files]);e.target.value=''};
 $('pending-images').onclick=e=>{
   const b=e.target.closest('[data-remove-image]');if(!b||captureBusy)return;
   const id=b.dataset.removeImage;URL.revokeObjectURL(objectURLs.get(id));objectURLs.delete(id);
-  pendingImages=pendingImages.filter(x=>x.id!==id);renderAttachments();
+  pendingImages=pendingImages.filter(x=>x.id!==id);renderAttachments();if(typeof renderPendingTranscript==='function')renderPendingTranscript();
 };
 document.addEventListener('paste',e=>{
   if(document.querySelector('dialog[open]'))return;
@@ -111,9 +111,9 @@ composer.onsubmit=async e=>{
   const text=$('capture').value.trim();if(!text&&!pendingImages.length){$('capture').focus();return}
   captureBusy=true;const saveButton=composer.querySelector('[type=submit]');saveButton.disabled=true;$('capture').readOnly=true;
   const url=captureLink(text);const duplicate=url&&!pendingImages.length?notes.find(n=>!n.deleted&&n.url===url.href&&(!!safeURL(text)||n.body===text)):null;if(duplicate){captureBusy=false;saveButton.disabled=false;$('capture').readOnly=false;detail(duplicate.title,duplicate.body,(categories.find(c=>c.id===duplicate.category)||categories[0]).name,duplicate.url,duplicate);toast('Already here. Opened your existing save.');return}const destination={...categories[selected]};
-  const record={id:'n'+crypto.randomUUID(),category:destination.id,type:pendingImages.length?(ACCEPTED_IMAGES.has(pendingImages[0].blob.type)?'image':pendingImages[0].blob.type.startsWith('audio/')?'audio':'video'):url?'link':'note',title:pendingImages.length?(text.split('\n')[0]||pendingImages[0].name):url?url.hostname:text.split('\n')[0].slice(0,85),body:text,url:url?.href,images:pendingImages.filter(x=>ACCEPTED_IMAGES.has(x.blob.type)),media:pendingImages.filter(x=>!ACCEPTED_IMAGES.has(x.blob.type)),tags:[],localOnly:$('capture-local-only').checked,metadata:pendingLink?.url===url?.href?pendingLink?.metadata:null,createdAt:Date.now(),time:'On this device'};
+  const record={id:'n'+crypto.randomUUID(),category:destination.id,type:pendingImages.length?(ACCEPTED_IMAGES.has(pendingImages[0].blob.type)?'image':pendingImages[0].blob.type.startsWith('audio/')?'audio':'video'):url?'link':'note',title:pendingImages.length?(text.split('\n')[0]||pendingImages[0].name):url?url.hostname:text.split('\n')[0].slice(0,85),body:text,url:url?.href,images:pendingImages.filter(x=>ACCEPTED_IMAGES.has(x.blob.type)),media:pendingImages.filter(x=>!ACCEPTED_IMAGES.has(x.blob.type)),transcript:pendingImages.map(x=>x.transcript||'').filter(Boolean).join('\n\n'),tags:[],localOnly:false,metadata:pendingLink?.url===url?.href?pendingLink?.metadata:null,createdAt:Date.now(),time:'On this device'};
   try{
-    await storeSave(record);notes.unshift(record);pendingImages=[];renderAttachments();
+    await storeSave(record);notes.unshift(record);if(typeof trackPendingTranscripts==='function')trackPendingTranscripts(record);pendingImages=[];renderAttachments();if(typeof renderPendingTranscript==='function')renderPendingTranscript();
     $('capture').value='';$('search').value='';pendingLink=null;previewController?.abort();clearTimeout(previewTimer);renderPendingLink();render();
     toast('In '+destination.name+' · saved on this device');notifyLocalChange();enrichSave(record);enqueueOCR(record);
   }catch{toast('Couldn’t save to this browser. Your draft is still here; free some space and try again.')}

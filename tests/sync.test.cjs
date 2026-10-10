@@ -2,12 +2,12 @@ const {test}=require('node:test'),assert=require('node:assert/strict'),fs=requir
 const ROOT=process.env.PASTEINN_ROOT||require('node:path').join(__dirname,'..'),P=require(ROOT+'/dist/sync-protocol.js');
 const category={id:'inbox',name:'Inbox',icon:'Inbox',color:'#b9c990'};
 const note=(id,body)=>({id,revision:id+'-rev',ancestors:[],title:body,body,type:'note',category:'inbox',createdAt:1,images:[],media:[]});
-async function harness({remoteRecords=[],local=[],wrongKey=false,conflict=false,privateRepo=true,failWrite=false,editDuringUpload=false}={}){
+async function harness({remoteRecords=[],local=[],wrongKey=false,conflict=false,privateRepo=true,failWrite=false,editDuringUpload=false,crates=[category]}={}){
   const keyText=P.generateKey(),key=await P.importKey(keyText),nodes=new Map(),storage=new Map(),calls=[];
   let records=structuredClone(local),remote=remoteRecords.length?await P.encrypt({format:'pasteinn-sync-v1',records:remoteRecords,categories:[category]},key):null,sha=remote?'sha-1':null,conflicted=false;
   const $=id=>{if(!nodes.has(id))nodes.set(id,{value:'',textContent:'',checked:true,disabled:false,hidden:false});return nodes.get(id)};
   const context=vm.createContext({console,Protocol:P,crypto,TextEncoder,TextDecoder,Uint8Array,Blob,AbortController,Response,URL,Date,JSON,Map,Set,Promise,structuredClone,
-    $,categories:[category],notes:records,document:{addEventListener(){}},window:{addEventListener(){}},navigator:{onLine:true},localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)},
+    $,categories:crates,allCrates:()=>crates,notes:records,document:{addEventListener(){}},window:{addEventListener(){}},navigator:{onLine:true},localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)},
     setTimeout:(fn,ms)=>{const timer=setTimeout(fn,ms);timer.unref();return timer},clearTimeout,
     allLocalRecords:async()=>structuredClone(records),persistRecords:async r=>{records=r},mergeCategories:()=>{},
     validatePayload:value=>{P.validateRecords(value.records);return value},downloadFile:()=>{},
@@ -58,4 +58,12 @@ test('failed upload leaves local data and does not report a successful sync',asy
 });
 test('a local edit during upload remains queued and is not overwritten',async()=>{
   const h=await harness({local:[note('local','before')],editDuringUpload:true});await h.connect();assert.equal(h.records()[0].body,'edited while uploading');assert.equal((await h.remote()).records[0].body,'before');assert.equal(h.$('sync-status').textContent,'Saved here · sync queued');
+});
+
+test('crate settings, retired crates and transcripts survive encrypted sync',async()=>{
+  const retired=P.revised({...category,id:'retired',deleted:true});
+  const drawn={id:'drawn',name:'Drawn crate',icon:'HandDrawn',color:'#e7a170',drawing:'1'+'0'.repeat(1023),appearance:{cards:{layout:'compact',title:false},background:{base:'#15201b',seed:8}}};
+  const r={...note('voice',''),transcript:'A small thought.'};
+  const h=await harness({local:[r],crates:[category,retired,drawn]});await h.connect();const payload=await h.remote();
+  assert.equal(payload.records[0].transcript,'A small thought.');assert.equal(payload.categories.find(c=>c.id==='retired').deleted,true);assert.equal(payload.categories.find(c=>c.id==='drawn').drawing.length,1024);assert.equal(payload.categories.find(c=>c.id==='drawn').appearance.cards.title,false);
 });

@@ -1,6 +1,6 @@
-const CACHE='pasteinn-core-v1';
-const SHELL=['concept.html','concept.css','concept.js','capture.js','drawing.js','local-core.js','sync.js','sync-protocol.js','install.js','vendor/lucide-1.53.0.min.js','vendor/fflate-0.8.3.min.js','vendor/ocr/tesseract.min.js','assets/a-little-space.png','assets/paste-inn-wordmark.png','assets/paper-grain.svg','manifest.webmanifest','assets/app-icon.svg'];
-self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting()))});
+const CACHE='pasteinn-core-v2';
+const SHELL=['concept.html','inn.css','experience.css','experience.js','surface.js','menus.js','speech.js','speech-worker.mjs','assets/inn-hand.woff2','concept.css','concept.js','capture.js','drawing.js','local-core.js','sync.js','sync-protocol.js','install.js','vendor/lucide-1.53.0.min.js','vendor/fflate-0.8.3.min.js','vendor/ocr/tesseract.min.js','assets/a-little-space.png','assets/paste-inn-wordmark.png','assets/paper-grain.svg','manifest.webmanifest','assets/app-icon.svg'];
+self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL.map(path=>/\.(css|js)$/.test(path)?path+'?v=20261010-5':path))).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('pasteinn-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',event=>{
   const url=new URL(event.request.url);

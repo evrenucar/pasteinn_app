@@ -57,15 +57,15 @@ async function buildBackup(){
   for(const record of records){
     const item={...record,images:[],media:[]};
     for(const field of ['images','media'])for(const file of record[field]||[]){
-      const descriptor={id:file.id,name:file.name,type:file.blob?.type||file.type,originalName:file.originalName,compressed:!!file.compressed};
+      const descriptor={id:file.id,name:file.name,type:file.blob?.type||file.type,originalName:file.originalName,compressed:!!file.compressed,transcript:file.transcript,speechState:file.speechState};
       if(file.blob){descriptor.path=`attachments/${record.id}/${file.id}-${archiveName(file.name)}`;files[descriptor.path]=new Uint8Array(await file.blob.arrayBuffer())}
       item[field].push(descriptor);
     }
     items.push(item);
     const links=[...item.images,...item.media].filter(x=>x.path).map(x=>`[${x.name.replace(/[\[\]]/g,'')}](${('../'+x.path).split('/').map(encodeURIComponent).join('/')})`).join('\n');
-    files[`notes/${record.id}.md`]=fflate.strToU8(`# ${record.title}\n\n${record.body||''}\n\n${links}\n\n${record.ocrText?'Image text:\n'+record.ocrText:''}\n`);
+    files[`notes/${record.id}.md`]=fflate.strToU8(`# ${record.title}\n\n${record.body||''}\n\n${links}\n\n${record.ocrText?'Image text:\n'+record.ocrText:''}\n\n${record.transcript?'Transcript:\n'+record.transcript:''}\n`);
   }
-  files['pasteinn.json']=fflate.strToU8(JSON.stringify({format:'pasteinn-backup-v1',exportedAt:new Date().toISOString(),categories,records:items},null,2));
+  files['pasteinn.json']=fflate.strToU8(JSON.stringify({format:'pasteinn-backup-v1',exportedAt:new Date().toISOString(),categories:allCrates(),preferences:window.InnSurface?.export(),records:items},null,2));
   const archiveBytes=Object.values(files).reduce((sum,bytes)=>sum+bytes.length,0);if(archiveBytes>190*1024*1024)throw Error('This early build supports backup archives up to 190 MB. Download large original attachments from their save before exporting a smaller library.');
   files['README.txt']=fflate.strToU8('Paste Inn backup v1\nUnencrypted: store this archive somewhere safe.\npasteinn.json contains categories, records, revision history and attachment paths.\nnotes/ contains readable Markdown. attachments/ contains original local files (or compressed files received through sync).\nNo GitHub tokens or recovery keys are included. Import through Paste Inn → Storage → Restore backup.\n');
   return new Promise((resolve,reject)=>fflate.zip(files,{level:0},(error,bytes)=>error?reject(error):resolve(bytes)));
@@ -85,13 +85,14 @@ function validatePayload(payload){
     if(typeof r.title!=='string'||r.title.length>1000||typeof r.body!=='string'||r.body.length>1000000||typeof r.category!=='string'||!Number.isFinite(r.createdAt))throw Error('Invalid saved content');
     if(r.url&&!safeURL(r.url))throw Error('Invalid link');
     if(r.metadata&&(typeof r.metadata!=='object'||typeof r.metadata.title!=='string'||(r.metadata.image&&!safeURL(r.metadata.image))))throw Error('Invalid preview');
+    if(r.transcript!==undefined&&(typeof r.transcript!=='string'||r.transcript.length>1000000))throw Error('Invalid transcript');
     if(r.ocrText!==undefined&&typeof r.ocrText!=='string')throw Error('Invalid image text');
     if(r.tags&&(!Array.isArray(r.tags)||r.tags.length>30||r.tags.some(t=>typeof t!=='string'||t.length>100)))throw Error('Invalid tags');
     for(const field of ['images','media']){if(r[field]!==undefined&&(!Array.isArray(r[field])||r[field].length>8))throw Error('Invalid attachments');for(const f of r[field]||[])if(typeof f.id!=='string'||!/^[a-z0-9-]{1,200}$/i.test(f.id)||typeof f.name!=='string'||f.name.length>500||typeof f.type!=='string'||(field==='images'?!ACCEPTED_IMAGES.has(f.type):!/^audio\/|^video\//.test(f.type)))throw Error('Invalid attachment');}
   }
   return payload;
 }
-function mergeCategories(incoming){categories=Protocol.mergeRecords(categories,incoming).map(c=>c.conflict&&!c.name.endsWith(' (copy)')?{...c,name:c.name.slice(0,21)+' (copy)'}:c);localStorage.setItem(CATEGORY_KEY,JSON.stringify(categories));renderWheel();selectCategory(Math.min(selected,categories.length-1),false);paintWheel()}
+function mergeCategories(incoming){const merged=Protocol.mergeRecords(allCrates(),incoming).map(c=>c.conflict&&!c.name.endsWith(' (copy)')?{...c,name:c.name.slice(0,21)+' (copy)'}:c);categories=merged.filter(c=>!c.deleted);archivedCategories=merged.filter(c=>c.deleted);if(!categories.some(c=>c.id==='inbox'))categories.unshift({...defaultCategories[0]});persistCrates();renderWheel();selectCategory(Math.min(selected,categories.length-1),false);paintWheel();window.InnUI?.refreshCrates()}
 $('import-backup').onclick=()=>$('backup-input').click();
 $('backup-input').onchange=async e=>{
   const file=e.target.files[0];e.target.value='';if(!file)return;$('storage-result').textContent='Checking backup…';
@@ -110,7 +111,7 @@ $('backup-input').onchange=async e=>{
         return {...f,blob:f.path?new Blob([files[f.path]],{type:f.type}):null};
       });return value;
     });
-    const combined=Protocol.mergeRecords(await allLocalRecords(),incoming);await persistRecords(combined);mergeCategories(payload.categories);notifyLocalChange();
+    const combined=Protocol.mergeRecords(await allLocalRecords(),incoming);await persistRecords(combined);mergeCategories(payload.categories);if(payload.preferences)window.InnSurface?.restore(payload.preferences);notifyLocalChange();
     $('storage-result').textContent='Backup restored. Conflicting versions are kept as separate copies.';
   }catch(error){$('storage-result').textContent=error.message}
 };
@@ -131,15 +132,3 @@ function enqueueOCR(record){
 }
 $('retry-ocr').onclick=()=>{const r=notes.find(x=>x.id===activeSaveId);if(r){r.ocrStatus='pending';enqueueOCR(r)}};
 $('take-photo').onclick=()=>$('camera-input').click();$('camera-input').onchange=e=>{addImages([...e.target.files]);e.target.value=''};
-$('record-voice').onclick=async()=>{
-  if(recording){recording.stop();return}
-  try{
-    recordingStream=await navigator.mediaDevices.getUserMedia({audio:true});
-    const chunks=[];recording=new MediaRecorder(recordingStream);const recorder=recording;
-    recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
-    recorder.onstop=()=>{recordingStream?.getTracks().forEach(t=>t.stop());recordingStream=null;recording=null;$('record-voice').classList.remove('recording');$('record-voice').setAttribute('aria-label','Record voice');$('recording-status').hidden=true;const mime=recorder.mimeType||'audio/webm';addImages([new File(chunks,`Voice note ${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.${mime.includes('mp4')?'m4a':'webm'}`,{type:mime})]);};
-    recorder.onerror=()=>{toast('Recording failed. Please try again.');if(recorder.state!=='inactive')recorder.stop()};
-    recorder.start();$('record-voice').classList.add('recording');$('record-voice').setAttribute('aria-label','Stop recording');$('recording-status').hidden=false;
-    setTimeout(()=>{if(recording===recorder&&recorder.state==='recording'){recorder.stop();toast('Five-minute recording limit reached. Your voice note is attached.')}},5*60*1000);
-  }catch{recordingStream?.getTracks().forEach(t=>t.stop());recording=null;toast('Microphone unavailable. Check this site’s permission, or attach an audio file.')}
-};

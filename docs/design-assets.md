@@ -6,7 +6,7 @@ Generated 9 October 2026 with the built-in ImageGen tool. Each asset was generat
 
 File: `dist/assets/a-little-space.png` (2170 × 725, transparent PNG).
 
-Current use: large visual heading in the app preview and landing page. This is an original raster lettering study, not a complete font. A full typeface or editable lettering system remains future design work.
+Current use: large visual heading in the app preview. This is an original raster lettering study, not a complete font. A reusable interface font was added in the October 10 pass (below).
 
 Exact prompt:
 
@@ -87,3 +87,12 @@ Exact wordmark prompt:
 > Constraints: true transparent background with alpha. Exact lowercase text only, with a clear space between paste and inn. No icon, no period, no extra punctuation, no surrounding shapes, no glow, no shadow, no speckles, no texture particles, no gradients, no background, no watermark. Not fine cursive, not conventional rigid arcade type; preserve coarse stepped-pixel edges and natural hand-drawn imperfection.
 
 The current background uses `paper-grain.svg`: fine code-native turbulence multiplied by a lower-frequency density field, at reduced opacity behind content. The founder rejected both the original glowing gradient and the later excessive/uniform grain. The app icon is a small original code-native SVG; category library icons are Lucide, with its bundled license. Custom user drawings are data, not generated brand artwork.
+
+
+## October 10: reusable Inn Hand and procedural paper
+
+`dist/assets/inn-hand.woff2` is a renamed SIL OFL derivative of [Gaegu Bold](https://github.com/google/fonts/tree/main/ofl/gaegu), rasterized at 40 px and traced into square pixel outlines. It covers Latin/extended Latin and common punctuation; unsupported scripts use a normal fallback while stored text remains unchanged. The source copyright and OFL are preserved in `inn-hand-LICENSE.txt`. All arbitrary interface text and landing greetings now use this font. The original app heading and wordmark remain raster lettering studies. Regeneration uses `scripts/generate-hand-font.py` with fontTools, Pillow, and Brotli installed in an isolated environment.
+
+`surface.js` replaces both the old isolated right-side blob and static SVG grain with angular, overlapping code-native paper strokes and a separate density-modulated noise canvas. It uses no radial gradients, remote textures, or generated background images. Parameters and reduced-motion support are documented in [the UX pass](ux-oct10.md). The pixel crate mark in `experience.js` is an original three-face SVG using stepped edges.
+
+Speech dependencies are Transformers.js 3.8.1 (Apache-2.0), the pinned distribution’s ONNX runtime assets (MIT), and quantized Xenova/whisper-tiny model files (downloaded from Hugging Face into browser cache on first use). Licenses for vendored code live alongside `dist/vendor/speech/`. No model weights, test recordings, clipboard data, or user saves are committed.
