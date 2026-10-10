@@ -18,17 +18,13 @@ A cozy little home for things you want to keep. Copy something. Paste it inn. Fi
 
 Your saves live on your device first. Optional encrypted GitHub sync lets you bring them to another device. Install it as a web app on your phone or desktop.
 
-<p align="center"><img src="dist/assets/cozy-no-rush-v2.png" width="220" alt="No rush, really."></p>
+<p align="center"><img src="dist/assets/a-little-space.png" width="260" alt="a little space."></p>
 
-### Run locally
+### Come on over
 
-No build step. Serve `dist/` with any static web server, or use the included preview:
+[Open Paste Inn](https://pasteinn.com) · [Go straight to your inn](https://pasteinn.com/concept.html)
 
-```sh
-python3 -B server.py --port 4174
-```
-
-Open [the inn](http://127.0.0.1:4174/concept.html) or [the landing page](http://127.0.0.1:4174/landing.html).
+No installation, build step or Python required. The app runs in your browser, hosted on GitHub Pages. For development, serve `dist/` with any static web server; the optional preview helper is documented below.
 
 ### Still settling in
 
