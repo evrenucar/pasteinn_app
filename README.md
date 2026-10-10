@@ -1,3 +1,5 @@
+[https://pasteinn.com/landing.html](https://pasteinn.com/landing.html)
+
 <p align="center">
   <img src="docs/images/welcome.gif" width="240" alt="Paste Inn’s pixel p gently floating">
 </p>
@@ -24,12 +26,8 @@ Your saves live on your device first. Optional encrypted GitHub sync lets you br
 
 [Open Paste Inn](https://pasteinn.com) · [Go straight to your inn](https://pasteinn.com/concept.html)
 
-No installation, build step or Python required. The app runs in your browser, hosted on GitHub Pages. For development, serve `dist/` with any static web server; the optional preview helper is documented below.
+No installation, build step or Python required. The app runs in your browser, hosted on GitHub Pages.
 
-### Still settling in
+### Something missing?
 
-An early, evolving project. GitHub sync is experimental and unaudited. Audio/video files stay on the capture device; transcripts can sync. Rich link previews currently need the development helper. Native apps and advanced sharing are future work.
-
-[Development & setup](docs/development.md) · [Storage protocol](docs/storage-protocol.md) · [Design notes](docs/design-direction.md)
-
-<sub>Made for the little things worth keeping. Pixel lettering, Lucide icons, and a little orange dot.</sub>
+Let me know if you need a feature or run into an issue. [Leave a note here](https://github.com/evrenucar/pasteinn_app/issues).
