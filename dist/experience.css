@@ -100,3 +100,18 @@
 .item.layout-compact .card-bottom{padding:10px 12px;min-height:0;min-width:170px;gap:8px;align-items:flex-end}
 .item.layout-compact .card-info,.item.layout-compact .card-copy{align-self:flex-end}
 @media(max-width:560px){.item.layout-compact .card-bottom{min-width:100px;max-width:36%;padding:8px;gap:3px}.item.layout-compact .card-category{font-size:13px!important}.item.layout-compact .card-main:has(.url-viewport){grid-template-columns:72px minmax(0,1fr)!important}.item.layout-compact .card-main:has(iframe){display:flex!important;flex-direction:column;align-items:stretch}.item.layout-compact .card-copy,.item.layout-compact .card-info{width:24px;min-width:24px;padding:3px}.item.layout-compact .card-main{padding:10px}.item.layout-compact .card-date{font-size:12px}}
+
+/* Crate names need room, with fixed icon and count columns. */
+#category-editor .editor-heading{padding-right:30px;margin-bottom:24px;gap:12px;align-items:center}
+#category-editor .editor-heading h2{font-size:27px;line-height:1.2;margin:0;min-width:0}
+#new-category{flex:none;font-size:19px;padding:7px 9px;color:var(--orange);white-space:nowrap}
+#crate-overview{grid-template-columns:minmax(0,1fr);gap:6px}
+#crate-overview button{display:grid;grid-template-columns:26px minmax(0,1fr) 30px;gap:13px;align-items:center;min-height:58px;padding:12px 14px;font-size:23px;line-height:1.3;border:1px solid transparent;border-radius:5px;background:color-mix(in srgb,var(--text) 3%,transparent)}
+#crate-overview button:hover{background:color-mix(in srgb,var(--text) 7%,transparent);border-color:var(--line)}
+#crate-overview button:focus-visible{outline:2px solid var(--orange);outline-offset:1px}
+#crate-overview button>svg,#crate-overview button>img{width:24px;height:24px;min-width:24px;max-width:24px;object-fit:contain}
+#crate-overview button>span{min-width:0;overflow-wrap:normal;word-break:normal;text-align:left}
+#crate-overview small{text-align:right;font-size:17px;line-height:1;color:var(--quiet);font-variant-numeric:tabular-nums}
+@media(max-width:480px){#category-editor{padding:24px 18px}#category-editor .editor-heading h2{font-size:24px}#crate-overview button{font-size:21px;padding:11px 12px;gap:12px}}
+
+#category-editor .editor-heading{flex-wrap:wrap;row-gap:10px}#category-editor .editor-heading h2{flex:1 0 100%;white-space:nowrap}#category-editor #new-category{padding:4px 0;font-size:18px}
