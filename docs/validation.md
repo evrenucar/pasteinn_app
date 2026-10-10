@@ -41,4 +41,4 @@ Tailscale follow-up: the HTTPS app and metadata endpoint returned successfully t
 
 ## October 10 web-app pass
 
-See [web-app verification](web-app-oct10.md): 23 Node tests and 5 Python tests now pass. Independent crate connections and public encrypted sharing replace the former shared-chests deferral. Production publication, real-device install/media checks, live two-device sync and independent security review remain pending.
+See [web-app verification](web-app-oct10.md): 24 Node tests and 5 Python tests now pass. Independent crate connections and public encrypted sharing replace the former shared-chests deferral. Production publication, real-device install/media checks, live two-device sync and independent security review remain pending.

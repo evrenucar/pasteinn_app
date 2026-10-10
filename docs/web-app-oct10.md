@@ -10,7 +10,7 @@
 
 ## Verification
 
-23 Node tests (14 existing + 9 new) and 5 Python helper tests passed. New transport tests prove scope isolation, public read-only requests without Authorization, wrong-key/mixed-scope rejection, encrypted device registration, and conditional-write retries. Source syntax, duplicate IDs and manifest/icon asset references checked. Browser transcript search retrieved the supplied voice note while Inbox was selected; its native player changed to pause directly on the card. General side preferences saved and restored. Phone-width wheel containment was verified and screenshots saved. No live user content repo or physical second-device sync has been connected during testing.
+24 Node tests (14 existing + 10 new) and 5 Python helper tests passed. New transport tests prove scope isolation, public read-only requests without Authorization, wrong-key/mixed-scope rejection, encrypted device registration, and conditional-write retries. Source syntax, duplicate IDs and manifest/icon asset references checked. Browser transcript search retrieved the supplied voice note while Inbox was selected; its native player changed to pause directly on the card. General side preferences saved and restored. Phone-width wheel containment was verified and screenshots saved. No live user content repo or physical second-device sync has been connected during testing.
 
 ## Deployment
 

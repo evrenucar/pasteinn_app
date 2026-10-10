@@ -45,7 +45,7 @@ async function serializeSync(records){
   for(const record of records){
     const r=Protocol.normalize(record);
     // A redaction tombstone removes currently published content, while the local copy stays put.
-    if(r.localOnly){exported.push({id:r.id,revision:r.revision,ancestors:r.ancestors,deleted:true,redacted:true,type:'note',title:'',body:'',category:'inbox',createdAt:r.createdAt,updatedAt:r.updatedAt,images:[],media:[]});continue}
+    if(r.localOnly){exported.push({id:r.id,revision:r.revision,ancestors:r.ancestors,deleted:true,redacted:true,sharedSource:r.sharedSource,type:'note',title:'',body:'',category:'inbox',createdAt:r.createdAt,updatedAt:r.updatedAt,images:[],media:[]});continue}
     exported.push({...r,images:await Promise.all((r.images||[]).map(compressedImage)),media:(r.media||[]).map(f=>({id:f.id,name:f.name,type:f.blob?.type||f.type,transcript:f.transcript,speechState:f.speechState==='working'?'pending':f.speechState,localOnly:true})),ocrStatus:r.ocrStatus==='working'?'pending':r.ocrStatus});
   }
   return {format:'pasteinn-sync-v1',records:exported,categories:allCrates(),...(window.InnSync?{devices:window.InnSync.devicesFor(syncSession)}:{})};
