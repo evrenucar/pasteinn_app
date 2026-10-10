@@ -26,7 +26,7 @@ Your saves live on your device first. Optional encrypted GitHub sync lets you br
 
 [Open Paste Inn](https://pasteinn.com) · [Go straight to your inn](https://pasteinn.com/concept.html)
 
-No installation, build step or Python required. The app runs in your browser, hosted on GitHub Pages.
+Runs in your browser. No Python or setup needed.
 
 ### Something missing?
 

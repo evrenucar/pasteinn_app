@@ -1,4 +1,4 @@
-// Local capture: images stay in this browser, and only link URLs reach the preview helper.
+// Local capture: images stay in this browser; previews request the linked public provider.
 const objectURLs=new Map();
 let pendingImages=[], pendingLink=null, previewController=null, previewTimer, captureBusy=false;
 const ACCEPTED_IMAGES=new Set(['image/png','image/jpeg','image/webp','image/gif','image/avif','image/bmp']);
@@ -77,10 +77,43 @@ function renderPendingLink(){
   $('pending-link').hidden=!pendingLink;
   $('pending-link').innerHTML=pendingLink?previewMarkup(pendingLink):'';
 }
+// Read public metadata directly; no local server or third-party scraping proxy.
 async function fetchMetadata(url,signal){
-  const response=await fetch('/api/preview?url='+encodeURIComponent(url),{headers:{'X-Paste-Inn':'preview'},signal});
-  if(!response.ok)throw Error('No preview');
-  return response.json();
+  const u=safeURL(url);if(!u)throw Error('Invalid link');
+  const host=u.hostname.replace(/^www\./,'');
+  const get=async endpoint=>{
+    const response=await fetch(endpoint,{signal,credentials:'omit',referrerPolicy:'no-referrer'});
+    if(!response.ok)throw Error('No preview');return response;
+  };
+  const clean=(title,description,image)=>({title:String(title||host).slice(0,300),description:String(description||'').slice(0,600),image:safeURL(image)?.href||null});
+  let endpoint;
+  if(['youtube.com','m.youtube.com','youtu.be'].includes(host)){
+    const id=host==='youtu.be'?u.pathname.split('/')[1]:u.searchParams.get('v')||u.pathname.match(/^\/(?:shorts|embed|live)\/([^/]+)/)?.[1];
+    if(id&&/^[\w-]{11}$/.test(id))endpoint='https://www.youtube.com/oembed?format=json&url='+encodeURIComponent('https://www.youtube.com/watch?v='+id);
+  }else if(host==='vimeo.com'||host==='player.vimeo.com'){
+    endpoint='https://vimeo.com/api/oembed.json?url='+encodeURIComponent(u.href);
+  }
+  if(endpoint){const data=await(await get(endpoint)).json();return clean(data.title,'',data.thumbnail_url)}
+  if(host==='github.com'){
+    const parts=u.pathname.split('/').filter(Boolean);
+    if(parts.length>=2){
+      const data=await(await get('https://api.github.com/repos/'+parts.slice(0,2).map(encodeURIComponent).join('/'))).json();
+      return clean(data.full_name,data.description,data.owner?.avatar_url);
+    }
+  }
+  const response=await get(u.href);
+  if(!/text\/html|application\/xhtml/i.test(response.headers.get('content-type')||''))throw Error('No page metadata');
+  const reader=response.body.getReader();let chunks=[],size=0;
+  try{while(true){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;if(size>1024*1024)break;chunks.push(value)}}finally{await reader.cancel()}
+  const page=new DOMParser().parseFromString(await new Blob(chunks).text(),'text/html');
+  const meta=(...keys)=>{for(const key of keys){const value=page.querySelector('meta[property="'+key+'"],meta[name="'+key+'"]')?.content;if(value)return value}return ''};
+  const title=meta('og:title','twitter:title')||page.querySelector('title')?.textContent;
+  const description=meta('og:description','twitter:description','description');
+  let image;try{image=new URL(meta('og:image','twitter:image'),response.url||u.href).href}catch{}
+  // An empty image tag must not become the page URL.
+  if(!meta('og:image','twitter:image'))image=null;
+  if(!title&&!description&&!image)throw Error('No page metadata');
+  return clean(title,description,image);
 }
 function schedulePreview(){
   clearTimeout(previewTimer);previewController?.abort();
