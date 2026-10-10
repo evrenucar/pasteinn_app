@@ -39,3 +39,5 @@
 .image-copy-target{display:block;padding:0;width:100%;text-align:left}.image-copy-target img{display:block}
 
 .input-tip{position:fixed;z-index:30;max-width:min(290px,calc(100vw - 16px));padding:9px 13px;background:#eeeeda;color:#172018;border-radius:5px;box-shadow:0 4px 20px #0004;font:18px/1.3 "Inn Hand",sans-serif;pointer-events:none}
+
+#clipboard-status{margin:8px 20px 12px;color:var(--orange);font:19px/1.4 "Inn Hand",sans-serif}
