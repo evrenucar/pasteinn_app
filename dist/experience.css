@@ -17,3 +17,13 @@
 
 #sync-connections{display:grid;gap:8px;margin:18px 0}#sync-connections button{text-align:left;padding:9px;border:1px solid var(--line);border-radius:4px;font-size:20px;overflow-wrap:anywhere}#sync-devices h3{font-size:26px;margin:18px 0 8px}.device-row{display:grid;gap:5px;padding:10px 0;border-bottom:1px solid var(--line);font-size:20px}.device-row span{display:flex;align-items:center;gap:7px}.device-row small{font-size:16px;color:var(--quiet)}#sync-form select{width:100%;padding:10px;background:#14231b;color:var(--text);font:22px 'Inn Hand',sans-serif;border:1px solid var(--line);border-radius:4px}.sync-help p{font-size:18px}
 .wheel-shell{height:150px!important}.selection-line{top:50px!important;height:50px!important;left:36px!important;right:0!important}.wheel-arrows{top:31px!important}.wheel-arrows button{height:44px!important;min-width:36px}
+
+#items{grid-auto-rows:1px;row-gap:0;grid-auto-flow:row dense}
+#items>.item{height:auto;align-self:start;margin-bottom:14px}
+.item.layout-compact .card-images{width:58px;max-width:58px;margin:0;grid-column:1;grid-row:1/5}
+.item.layout-compact .card-images img{width:58px;height:58px;max-height:58px;object-fit:contain}
+.item.layout-compact .card-url-image{width:58px;height:58px;max-height:58px;margin:0;grid-column:1;grid-row:1/5}
+.item.layout-compact h3,.item.layout-compact p,.item.layout-compact .link-domain{grid-column:2;min-width:0;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:1}
+.item.layout-compact .card-transcript{-webkit-line-clamp:2;white-space:normal}
+.item.layout-compact video{max-height:90px}
+@media(max-width:560px){.item.layout-compact .card-main:not(.media-content){display:grid;grid-template-columns:auto 1fr}.item.layout-compact .card-images,.item.layout-compact .card-images img,.item.layout-compact .card-url-image{width:42px;height:42px;max-height:42px}}
