@@ -13,3 +13,5 @@ dialog{width:calc(100% - 32px);max-width:580px;max-height:88dvh;overflow:auto;ba
 @media(prefers-reduced-motion:reduce){#appearance-dialog,#category-editor{animation:none}}
 
 .appearance-scope-row{position:sticky;top:-24px;background:#1d2922;z-index:2;padding:12px 0;margin-top:0!important}
+
+#install-guide{padding:10px 0 20px}#install-guide svg{display:block;width:100%;height:auto;stroke:none}#install-guide svg text{font-family:system-ui,sans-serif}#install-steps{padding-left:25px;font-size:20px}#install-steps li{padding:7px 0}#close-install-guide{margin-left:20px;color:var(--muted)}#install-now{color:var(--orange)}
