@@ -27,3 +27,8 @@
 .item.layout-compact .card-transcript{-webkit-line-clamp:2;white-space:normal}
 .item.layout-compact video{max-height:90px}
 @media(max-width:560px){.item.layout-compact .card-main:not(.media-content){display:grid;grid-template-columns:auto 1fr}.item.layout-compact .card-images,.item.layout-compact .card-images img,.item.layout-compact .card-url-image{width:42px;height:42px;max-height:42px}}
+
+.composer{background:color-mix(in srgb,var(--surface) 85%,transparent);border-color:color-mix(in srgb,var(--surface),var(--text) 30%)}
+.item{background:color-mix(in srgb,var(--card-surface,var(--surface)) 85%,transparent);border-color:color-mix(in srgb,var(--card-surface,var(--surface)),var(--text) 25%)}
+
+#appearance-dialog,#category-editor,.appearance-scope-row{background:var(--surface)}.patch-colors{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px 16px}.patch-colors label{margin:7px 0}
