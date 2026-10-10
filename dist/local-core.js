@@ -30,13 +30,13 @@ $('delete-save').onclick=async()=>{
 };
 $('edit-save').onclick=()=>{
   const record=notes.find(x=>x.id===activeSaveId);if(!record)return;
-  $('edit-title').value=record.title;$('edit-body').value=record.body;$('edit-tags').value=(record.tags||[]).join(', ');
+  $('edit-title').value=record.title;$('edit-body').value=window.InnContent?.generatedTitle(record)&&record.body===record.title?'':record.body;$('edit-tags').value=(record.tags||[]).join(', ');
   $('edit-category').innerHTML=categories.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('');$('edit-category').value=record.category;
   $('edit-record').showModal();
 };
 $('edit-record-form').onsubmit=async e=>{
   e.preventDefault();const old=notes.find(x=>x.id===activeSaveId);if(!old)return;
-  const body=$('edit-body').value.trim(),url=captureLink(body)?.href;
+  const body=$('edit-body').value.trim(),url=captureLink(body)?.href||old.url;
   const next={...old,title:$('edit-title').value.trim().slice(0,200)||old.title,body,category:$('edit-category').value,tags:[...new Set($('edit-tags').value.split(',').map(t=>t.trim()).filter(Boolean))].slice(0,30),url,metadata:url===old.url?old.metadata:null};
   try{await storeSave(next);notes=notes.map(x=>x.id===old.id?next:x);$('edit-record').close();$('detail').close();render();notifyLocalChange();enrichSave(next);toast('Changes saved')}
   catch{toast('Couldn’t save changes. Your edit is still here.')}
@@ -92,7 +92,7 @@ function validatePayload(payload){
   }
   return payload;
 }
-function mergeCategories(incoming){const merged=Protocol.mergeRecords(allCrates(),incoming).map(c=>c.conflict&&!c.name.endsWith(' (copy)')?{...c,name:c.name.slice(0,21)+' (copy)'}:c);categories=merged.filter(c=>!c.deleted);archivedCategories=merged.filter(c=>c.deleted);if(!categories.some(c=>c.id==='inbox'))categories.unshift({...defaultCategories[0]});persistCrates();renderWheel();selectCategory(Math.min(selected,categories.length-1),false);paintWheel();window.InnUI?.refreshCrates()}
+function mergeCategories(incoming){const wasFiltered=onlyCategory,selectedId=categories[selected]?.id;const merged=Protocol.mergeRecords(allCrates(),incoming).map(c=>c.conflict&&!c.name.endsWith(' (copy)')?{...c,name:c.name.slice(0,21)+' (copy)'}:c);categories=merged.filter(c=>!c.deleted);archivedCategories=merged.filter(c=>c.deleted);if(!categories.some(c=>c.id==='inbox'))categories.unshift({...defaultCategories[0]});persistCrates();renderWheel();selectCategory(Math.max(0,categories.findIndex(c=>c.id===selectedId)),false);onlyCategory=wasFiltered;window.InnSurface?.select(wasFiltered?categories[selected]:null);render();paintWheel();window.InnUI?.refreshCrates()}
 $('import-backup').onclick=()=>$('backup-input').click();
 $('backup-input').onchange=async e=>{
   const file=e.target.files[0];e.target.value='';if(!file)return;$('storage-result').textContent='Checking backup…';

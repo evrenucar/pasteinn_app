@@ -1,14 +1,17 @@
-# Future shared chests
+# Independent encrypted crates — October 10, 2026
 
-Founder direction: a separate secret for each chest, with encrypted data potentially stored in a public repository and a simple invitation to share access. This is **future work**, not a feature of the current personal sync UI.
+Crate sync is now implemented separately from the personal Storage room vault. Each destination has a repo, crate ID/path, independent encryption key, optional writer credential, visibility, and encrypted device registry. Multiple destinations can coexist with the all-crate private vault. Tokens and keys remain in session memory; only connection locations, visibility and last-sync times persist locally.
 
-Use two distinct concepts:
+## Invitation and access
 
-- **Chest encryption key:** grants the ability to decrypt that chest. Generate an independent random key per chest; never reuse a personal vault key. An invitation could include repository/chest location and the key, preferably in a URL fragment that is not sent as an HTTP request parameter. Treat it as a bearer secret, and avoid leaking it into logs, previews, analytics, or referrers.
-- **Repository write authorization:** grants the ability to publish changes. A personal GitHub token is repository-scoped and must not be shared as a chest invitation. Public encrypted content can be read without a GitHub token, but collaborative writes need an appropriate collaborator credential, a narrowly designed GitHub App, or a separate publishing service.
+Copy crate invite puts the repo, crate ID and crate key in a URL fragment. The receiving app removes that fragment immediately and pre-fills its connection form; it does not auto-connect. No GitHub token is shared. A public repo allows unauthenticated ciphertext reads; private reads require a token with repo access. Writes use each contributor's own scoped Contents-write token. There is no direct peer-to-peer device transport: devices exchange data through their selected repositories.
 
-The current code separates cryptography/revision merging (`sync-protocol.js`) from GitHub transport (`sync.js`). A future chest adapter should use chest-scoped paths/manifests and independent keys. The first version still has one encrypted personal vault at `pasteinn/vault.json`; category boundaries are organizational, not cryptographic isolation. Migrating to per-chest keys requires an explicit format/migration change.
+Public here means **public repository containing encrypted content**, not plaintext publication. Anyone who has both the ciphertext and crate key can read that crate. Do not reuse a personal vault key as a shared crate key. Device names are encrypted inside that scope. Read-only clients show the registry but cannot announce their own presence without write authorization. Open clients poll every 30 seconds; last sync does not imply live presence.
 
-Public repositories expose history, ciphertext sizes, timestamps, contributor identities, and access to indefinite copies of encrypted material. Key rotation can protect future additions; it cannot revoke plaintext or ciphertext/key combinations already downloaded. Deleting current files does not erase Git history. Membership changes, write roles, key distribution/rotation, rollback protection, and signed authorship need design before group editing ships.
+## Boundaries and merge behavior
 
-Avoid broadening the current app into a social feed or permissions dashboard. The intended surface remains a chest and an explicit, understandable share action.
+`scope.js` validates that a scoped file has exactly the expected crate and no records from other crates. Notes, transcripts, metadata, OCR and compressed images participate; original audio/video stays local. Moving a record out of a shared crate uploads an empty redaction tombstone, without its private destination or new content. The full local record is preserved. SHA conditional writes retry from fresh remote state; concurrent revisions are retained as conflict copies.
+
+## Limits
+
+20 MB encrypted-file limit, session-only unlocking and a mocked-transport test suite. A real two-device private/public sync trial remains to be done. Public Git history exposes sizes, timing and contributors, and retains older ciphertext. Removing a file or moving to trash does not revoke downloaded keys/content or erase history. Key rotation, revocation, roles, rollback protection and signed authorship require further design/security review.

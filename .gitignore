@@ -3,7 +3,8 @@
 .env.*
 !.env.example
 node_modules/
-.openai/
+.openai/*
+!.openai/hosting.json
 .sites-runtime/
 *.log
 preview.png

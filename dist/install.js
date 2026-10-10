@@ -1,6 +1,6 @@
+// Standard installable PWA: served as static files over HTTPS; no app server required.
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
-const shared=new URLSearchParams(location.search);if(shared.has('share')){
-  const text=[shared.get('text'),shared.get('url')].filter(Boolean).join('\n');
-  if(text){$('capture').value=text;schedulePreview();$('capture').focus()}
-  history.replaceState(null,'',location.pathname);
-}
+let installPrompt=null;addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e});
+addEventListener('appinstalled',()=>{installPrompt=null;const result=document.getElementById('install-status');if(result)result.textContent='Paste Inn is installed.'});
+const installButton=document.getElementById('install-app');if(installButton)installButton.onclick=async()=>{const result=document.getElementById('install-status');if(matchMedia('(display-mode: standalone)').matches){result.textContent='You’re already in the app.';return}if(installPrompt){const prompt=installPrompt;installPrompt=null;await prompt.prompt();const choice=await prompt.userChoice;result.textContent=choice.outcome==='accepted'?'Installing…':'You can install whenever you like.'}else result.textContent=/iPad|iPhone/.test(navigator.userAgent)?'Safari → Share → Add to Home Screen.':'Chrome menu → Cast, save and share → Install page as app.'};
+const shared=new URLSearchParams(location.search);if(shared.has('share')){const capture=document.getElementById('capture');const text=[shared.get('title'),shared.get('text'),shared.get('url')].filter(Boolean).join('\n');if(text&&capture){capture.value=text;schedulePreview();capture.focus()}history.replaceState(null,'',location.pathname+location.hash)}

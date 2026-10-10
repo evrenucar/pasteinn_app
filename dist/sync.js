@@ -1,8 +1,8 @@
 // The browser talks directly to GitHub. Tokens and recovery keys are never persisted.
 let syncSession=null,syncTimer,syncRunning=false,syncDirty=false,syncRetry=0;
 const SYNC_FILE='pasteinn/vault.json',SYNC_LIMIT=20*1024*1024;
-function syncSignature(payload){return JSON.stringify(['records','categories'].map(field=>payload[field].map(r=>`${r.id}:${Protocol.normalize(r).revision}`).sort()))}
-function syncStatus(message){$('sync-status').textContent=message;$('sync-badge').textContent=message;$('sync-badge').title=message}
+function syncSignature(payload){return JSON.stringify(['records','categories',...(payload.devices?['devices']:[])].map(field=>payload[field].map(r=>`${r.id}:${Protocol.normalize(r).revision}`).sort()))}
+function syncStatus(message){$('sync-status').textContent=message;if(window.InnSync)window.InnSync.badge();else $('sync-badge').textContent='Sync it';$('sync-badge').title=message}
 function savedSyncConfig(){try{return JSON.parse(localStorage.getItem('pasteinn-sync-config')||'null')}catch{return null}}
 const savedConnection=savedSyncConfig();if(savedConnection){$('sync-repo').value=savedConnection.repo||'';syncStatus(savedConnection.lastSync?'Locked · last sync '+new Date(savedConnection.lastSync).toLocaleString():'Sync locked')}
 $('open-sync').onclick=()=>{$('sync-dialog').showModal()};$('sync-badge').onclick=()=>{$('sync-dialog').showModal()};
@@ -12,7 +12,7 @@ $('load-key').onclick=()=>$('key-file').click();
 async function github(session,path,{method='GET',body,raw=false,missing=false}={}){
   const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),25000);
   try{
-    const response=await fetch(`https://api.github.com/repos/${session.repo}${path}`,{method,headers:{Accept:raw?'application/vnd.github.raw+json':'application/vnd.github+json',Authorization:'Bearer '+session.token,'X-GitHub-Api-Version':'2022-11-28',...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify(body)}:{}),signal:controller.signal,redirect:'error',cache:'no-store'});
+    const response=await fetch(`https://api.github.com/repos/${session.repo}${path}`,{method,headers:{Accept:raw?'application/vnd.github.raw+json':'application/vnd.github+json',...(session.token?{Authorization:'Bearer '+session.token}:{}),'X-GitHub-Api-Version':'2022-11-28',...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify(body)}:{}),signal:controller.signal,redirect:'error',cache:'no-store'});
     if(response.status===404&&missing)return null;
     if(!response.ok){const err=Error(response.status===401?'GitHub token expired or invalid.':response.status===403?'GitHub denied access or rate-limited this request.':response.status===404?'Repository not found, or this token cannot access it.':response.status===409||response.status===422?'The repository changed during sync. Retrying safely.':'GitHub could not finish this request.');err.status=response.status;throw err}
     if(Number(response.headers.get('content-length'))>SYNC_LIMIT*2)throw Error('Remote vault exceeds this preview’s size limit.');
@@ -23,12 +23,12 @@ async function github(session,path,{method='GET',body,raw=false,missing=false}={
   }finally{clearTimeout(timeout)}
 }
 async function remoteVault(session){
-  const file=await github(session,`/contents/${SYNC_FILE}?ref=${encodeURIComponent(session.branch)}`,{missing:true});
+  const file=await github(session,`/contents/${session.file||SYNC_FILE}?ref=${encodeURIComponent(session.branch)}`,{missing:true});
   if(!file)return {sha:null,payload:null};
   if(file.type!=='file'||file.size>SYNC_LIMIT||!file.sha)throw Error('Unsupported remote vault file.');
-  const envelope=file.content?JSON.parse(new TextDecoder().decode(Protocol.fromBase64(file.content.replace(/\s/g,'')))):await github(session,`/contents/${SYNC_FILE}?ref=${encodeURIComponent(session.branch)}`,{raw:true});
+  const envelope=file.content?JSON.parse(new TextDecoder().decode(Protocol.fromBase64(file.content.replace(/\s/g,'')))):await github(session,`/contents/${session.file||SYNC_FILE}?ref=${encodeURIComponent(session.branch)}`,{raw:true});
   const payload=validatePayload(await Protocol.decrypt(envelope,session.key));if(payload.format!=='pasteinn-sync-v1')throw Error('Not a sync vault');
-  return {sha:file.sha,payload};
+  if(session.crateId)InnScope.validate(payload,session.crateId);else if(payload.scope)throw Error('Choose the matching crate to open this file.');if(window.InnSync)payload.devices=InnScope.devices(payload.devices);return {sha:file.sha,payload};
 }
 async function compressedImage(file){
   if(!file.blob)return {...file,type:file.type||'image/webp',blob:undefined};
@@ -48,7 +48,7 @@ async function serializeSync(records){
     if(r.localOnly){exported.push({id:r.id,revision:r.revision,ancestors:r.ancestors,deleted:true,redacted:true,type:'note',title:'',body:'',category:'inbox',createdAt:r.createdAt,updatedAt:r.updatedAt,images:[],media:[]});continue}
     exported.push({...r,images:await Promise.all((r.images||[]).map(compressedImage)),media:(r.media||[]).map(f=>({id:f.id,name:f.name,type:f.blob?.type||f.type,transcript:f.transcript,speechState:f.speechState==='working'?'pending':f.speechState,localOnly:true})),ocrStatus:r.ocrStatus==='working'?'pending':r.ocrStatus});
   }
-  return {format:'pasteinn-sync-v1',records:exported,categories:allCrates()};
+  return {format:'pasteinn-sync-v1',records:exported,categories:allCrates(),...(window.InnSync?{devices:window.InnSync.devicesFor(syncSession)}:{})};
 }
 function deserializeSync(payload){
   return payload.records.map(r=>({...r,images:(r.images||[]).map(f=>{
@@ -61,7 +61,7 @@ function mergeLocalAndRemote(local,incoming){
   const merged=Protocol.mergeRecords(local.filter(x=>!privateIds.has(x.id)),incoming.filter(x=>!privateIds.has(x.id)));
   // Retain full originals that exist on this device, even when another device edited the note.
   const originals=new Map(local.flatMap(r=>[...(r.images||[]),...(r.media||[])].filter(f=>f.blob).map(f=>[f.id,f])));
-  return [...merged.map(r=>({...r,images:(r.images||[]).map(f=>originals.has(f.id)?originals.get(f.id):f),media:(r.media||[]).map(f=>originals.has(f.id)?originals.get(f.id):f)})),...privateSaves];
+  return [...merged.map(r=>({...r,images:(r.images||[]).map(f=>originals.has(f.id)?{...originals.get(f.id),...f,blob:originals.get(f.id).blob}:f),media:(r.media||[]).map(f=>originals.has(f.id)?{...originals.get(f.id),...f,blob:originals.get(f.id).blob}:f)})),...privateSaves];
 }
 async function runSync(){
   if(!syncSession)return;if(syncRunning){syncDirty=true;return}if(!navigator.onLine){syncStatus('Offline · saved here');syncDirty=true;return}
@@ -71,12 +71,12 @@ async function runSync(){
       const remote=await remoteVault(session);if(syncSession!==session)return;
       const local=await allLocalRecords(),remoteRecords=remote.payload?deserializeSync(remote.payload):[];
       const merged=mergeLocalAndRemote(local,remoteRecords);
-      if(remote.payload)mergeCategories(remote.payload.categories);
+      if(remote.payload){mergeCategories(remote.payload.categories);window.InnSync?.mergeDevices(session,remote.payload.devices)}
       const payload=await serializeSync(merged),unchanged=remote.payload&&syncSignature(payload)===syncSignature(remote.payload),envelope=await Protocol.encrypt(payload,session.key),bytes=new TextEncoder().encode(JSON.stringify(envelope));
       if(bytes.length>SYNC_LIMIT)throw Error('This early sync vault is full (20 MB). New saves remain local. Export a backup or exclude large saves.');
       if(syncSession!==session)return;
       try{
-        if(!unchanged)await github(session,`/contents/${SYNC_FILE}`,{method:'PUT',body:{message:'Sync encrypted Paste Inn vault',content:Protocol.toBase64(bytes),branch:session.branch,...(remote.sha?{sha:remote.sha}:{})}});
+        if(!unchanged)await github(session,`/contents/${session.file||SYNC_FILE}`,{method:'PUT',body:{message:'Sync encrypted Paste Inn vault',content:Protocol.toBase64(bytes),branch:session.branch,...(remote.sha?{sha:remote.sha}:{})}});
       }catch(error){if((error.status===409||error.status===422)&&attempt<2)continue;throw error}
       // Re-read after the network request so a simultaneous local save/edit cannot be overwritten.
       const newest=await allLocalRecords();await persistRecords(mergeLocalAndRemote(newest,merged));if(typeof broadcastLocalUpdate==='function')broadcastLocalUpdate();
@@ -96,7 +96,7 @@ $('sync-form').onsubmit=async e=>{
     const session={repo,token,key},info=await github(session,'');
     if(!info.private)throw Error('Personal vaults require a private repository. Public shared chests are future work.');
     if(info.permissions?.push===false)throw Error('This token needs Contents read/write permission for this repository.');
-    session.branch=info.default_branch||'main';
+    session.branch=info.default_branch||'main';session.private=info.private;session.devices=[];
     // Verify an existing vault before enabling uploads; a wrong key must never overwrite it.
     await remoteVault(session);syncSession=session;syncRetry=0;$('sync-token').value='';$('sync-key').value='';$('sync-now').hidden=false;$('lock-sync').hidden=false;
     localStorage.setItem('pasteinn-sync-config',JSON.stringify({repo,lastSync:savedSyncConfig()?.repo===repo?savedSyncConfig()?.lastSync:null}));await runSync();

@@ -37,3 +37,8 @@ The mock transport uses inert test tokens and does not contact a real content re
 - Domain deployment, HTTPS metadata-service hosting, native clients, permanent purge and shared chests remain outside this build.
 
 Tailscale follow-up: the HTTPS app and metadata endpoint returned successfully through Serve on port 8443 with normal certificate validation. The pre-existing HTTPS 443 mapping remained intact. This verifies the local tailnet endpoint, not connectivity from an actual second device.
+
+
+## October 10 web-app pass
+
+See [web-app verification](web-app-oct10.md): 23 Node tests and 5 Python tests now pass. Independent crate connections and public encrypted sharing replace the former shared-chests deferral. Production publication, real-device install/media checks, live two-device sync and independent security review remain pending.

@@ -2,7 +2,7 @@
 
 Before substantial implementation, extension, review, or release work, check for built-in features or a simpler existing solution. Give an early heads-up about what custom work adds; this is advice, not an extra approval gate. Respect the founder's explicit choice to continue Paste Inn.
 
-Prioritize core capture/retrieval/recovery/sync over further visual refinements unless requested. Keep the interface sparse. Shared chests remain future work with independent chest encryption keys, separate from repository credentials.
+Prioritize core capture/retrieval/recovery/sync over further visual refinements unless requested. Keep the interface sparse. Independent encrypted crate connections are implemented. Preserve their scope boundaries and separate encryption keys from repository credentials; never share a personal vault key as a crate invite.
 
 ## Cross-device test links
 

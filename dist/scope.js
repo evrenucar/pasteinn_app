@@ -1,0 +1,9 @@
+// Independent encrypted crate destinations; no repository credential belongs in an invite.
+(function(root){
+ const id=x=>typeof x==='string'&&/^[a-z0-9-]{1,200}$/i.test(x);
+ function validate(payload,crateId){if(payload.scope?.crateId!==crateId||payload.categories.length!==1||payload.categories[0].id!==crateId||payload.records.some(r=>r.category!==crateId))throw Error('This file contains a different crate. Nothing was imported.');return payload}
+ function devices(value=[]){if(!Array.isArray(value)||value.length>200)throw Error('Invalid device list');return value.map(d=>{if(!id(d.id)||!id(d.revision)||typeof d.name!=='string'||d.name.length>48||!Number.isFinite(d.lastSeen))throw Error('Invalid device');return {id:d.id,revision:d.revision,ancestors:Array.isArray(d.ancestors)?d.ancestors.filter(id).slice(-1000):[],name:d.name,lastSeen:d.lastSeen}})}
+ function forCrate(local,remote,crateId,P){const selected=local.filter(r=>r.category===crateId);const moved=remote.filter(r=>local.some(l=>l.id===r.id&&l.category!==crateId)).map(r=>P.revised({...r,deleted:true,redacted:true,title:'',body:'',transcript:'',ocrText:'',tags:[],url:undefined,metadata:undefined,images:[],media:[]}));return P.mergeRecords(selected,moved)}
+ function invite(repo,crateId,key){if(!id(crateId)||!/^pi1_[A-Za-z0-9_-]{43}$/.test(key))throw Error('Invalid crate invite');return new URLSearchParams({join:repo,crate:crateId,key}).toString()}
+ const api={validate,devices,forCrate,invite};if(typeof module!=='undefined')module.exports=api;else root.InnScope=api;
+})(typeof window!=='undefined'?window:globalThis);
