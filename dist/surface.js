@@ -1,7 +1,7 @@
 // One parametric paper field shared by the landing page and the inn.
 (() => {
   const KEY='pasteinn-appearance-v1';
-  const defaults={general:{wheelSide:'right',wheelPlacement:'auto',deviceName:''},background:{base:'#15201b',colors:['#344936','#a29340','#ad572f'],coverage:36,spread:68,x:60,y:48,grain:20,iconTint:true,motion:true,speed:18,seed:48},cards:{layout:'small',preview:true,title:true,body:true,media:true,date:true,crate:true,domain:true,transcript:true}};
+  const defaults={general:{wheelSide:'right',wheelPlacement:'auto',deviceName:''},background:{base:'#15201b',colors:['#344936','#a29340','#ad572f'],coverage:36,spread:68,x:60,y:48,grain:20,iconTint:true,motion:!matchMedia('(prefers-reduced-motion: reduce)').matches,speed:18,seed:48},cards:{layout:'small',preview:true,title:true,body:true,media:true,date:true,crate:true,domain:true,transcript:true}};
   const clone=x=>JSON.parse(JSON.stringify(x));
   const hex=c=>typeof c==='string'&&/^#[\da-f]{6}$/i.test(c);
   function cleanBackground(b={}){const d=defaults.background;return {base:hex(b.base)?b.base:d.base,colors:Array.from({length:3},(_,i)=>hex(b.colors?.[i])?b.colors[i]:d.colors[i]),...Object.fromEntries(['coverage','spread','x','y','grain','speed'].map(k=>[k,Number.isFinite(b[k])?Math.max(0,Math.min(100,b[k])):d[k]])),iconTint:typeof b.iconTint==='boolean'?b.iconTint:d.iconTint,motion:typeof b.motion==='boolean'?b.motion:d.motion,seed:Number.isFinite(b.seed)?Math.abs(b.seed)%100000:d.seed}}
@@ -24,7 +24,8 @@
     for(const k of ['coverage','spread','x','y','grain','speed'])current[k]+=(b[k]-current[k])*t;
     const colors=[rgb(b.base),...b.colors.map(rgb)];palette=palette.map((a,i)=>a.map((v,j)=>v+(colors[i][j]-v)*t));
     if(b.seed!==nextSeed){geometrySeed=seedBlend>.5?nextSeed:geometrySeed;nextSeed=b.seed;seedBlend=0}seedBlend=Math.min(1,seedBlend+dt/1.2);
-    const moving=b.motion&&!matchMedia('(prefers-reduced-motion: reduce)').matches;if(moving)phase+=dt*(.08+current.speed*.009);
+    // The saved drift switch is an explicit preference; reduced motion sets only the initial default.
+    const moving=b.motion;if(moving)phase+=dt*(.08+current.speed*.009);
     ctx.fillStyle='rgb('+palette[0].join(',')+')';ctx.fillRect(0,0,220,150);if(seedBlend<1)paintShapes(geometrySeed,current,1-seedBlend,moving);paintShapes(nextSeed,current,seedBlend,moving);
     // Grain remains anchored to the paper; it does not flicker between crates.
     paintNoise({...current,seed:831});document.documentElement.style.setProperty('--inn-base',b.base);
