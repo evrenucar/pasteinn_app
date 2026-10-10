@@ -137,3 +137,13 @@ dialog .dialog-close{z-index:5;display:grid;place-items:center;top:8px;right:8px
 .item .video-fullscreen svg{width:16px;height:16px;stroke-width:1.7;filter:drop-shadow(0 1px 2px #0009)}
 .item .video-fullscreen:hover,.item .video-fullscreen:focus-visible{background:#101411b3}
 .item.layout-compact .video-fullscreen{right:5px;bottom:5px;width:27px;height:27px;padding:6px}
+
+/* One compact action alongside the capture tools. */
+#capture-form .composer-bottom{align-items:center;gap:10px}
+#capture-form .save-button{white-space:nowrap;flex:none;width:auto;min-height:0;height:36px;padding:6px 12px;gap:10px;font-size:20px;line-height:1;border-radius:5px}
+#capture-form .save-button span{white-space:nowrap}
+#capture-form .capture-tools{min-width:0;gap:3px}
+#capture-form .capture-tools button{width:36px;min-width:32px;height:36px}
+#capture-form .capture-tools svg{width:24px;height:24px}
+@media(max-width:480px){#capture-form .composer-bottom{padding:5px 10px 12px;gap:6px}#capture-form .save-button{font-size:18px;padding-inline:10px;gap:7px}#capture-form .capture-tools{gap:0}#capture-form .capture-tools button{width:32px;min-width:29px}}
+@media(max-width:350px){#capture-form .save-button{font-size:16px;padding-inline:8px;gap:5px}#capture-form .capture-tools button{width:28px;min-width:26px}}
