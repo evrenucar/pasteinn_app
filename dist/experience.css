@@ -131,3 +131,9 @@ dialog .dialog-close{z-index:5;display:grid;place-items:center;top:8px;right:8px
 .url-viewport:has(iframe){background:#000}.item .url-viewport iframe{margin:0;display:block}.video-fullscreen{position:absolute;right:7px;bottom:7px;z-index:2;width:32px;height:32px;display:grid;place-items:center;border:1px solid #ffffff55;border-radius:4px;background:#151b18e6;color:#f0efda;padding:6px}.video-fullscreen:hover{background:#303b34}.url-viewport:fullscreen{width:100vw!important;height:100dvh!important;max-width:none!important;border-radius:0}.url-viewport:fullscreen iframe{width:100%;height:100%;aspect-ratio:auto}.url-viewport:fullscreen .video-fullscreen{display:none}.item.layout-compact .video-fullscreen{width:27px;height:27px;padding:5px;right:4px;bottom:4px}
 
 .recording-viewport{position:relative;width:100%;background:#000;border-radius:4px;overflow:hidden}.recording-viewport video{display:block;width:100%;margin:0!important}.recording-viewport:fullscreen{width:100vw;height:100dvh}.recording-viewport:fullscreen video{width:100%;height:100%;max-height:none!important}.recording-viewport:fullscreen .video-fullscreen{display:none}
+
+/* Quiet video control, matching the player rather than a card button. */
+.item .video-fullscreen{right:8px;bottom:8px;width:30px;height:30px;padding:7px;border:0;border-radius:6px;background:#10141155;color:#fff;box-shadow:none;transition:background .15s ease}
+.item .video-fullscreen svg{width:16px;height:16px;stroke-width:1.7;filter:drop-shadow(0 1px 2px #0009)}
+.item .video-fullscreen:hover,.item .video-fullscreen:focus-visible{background:#101411b3}
+.item.layout-compact .video-fullscreen{right:5px;bottom:5px;width:27px;height:27px;padding:6px}
