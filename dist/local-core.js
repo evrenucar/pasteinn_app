@@ -25,8 +25,24 @@ $('pin-save').onclick=async()=>{const r=notes.find(x=>x.id===activeSaveId);if(!r
 $('local-only').onchange=async e=>{const r=notes.find(x=>x.id===activeSaveId);if(!r)return;try{const next={...r,localOnly:e.target.checked};await storeSave(next);notes=notes.map(x=>x.id===r.id?next:x);notifyLocalChange();toast(next.localOnly?'Kept on this device. Earlier repository history is unchanged.':'Included in the next sync.')}catch{e.target.checked=!!r.localOnly;toast('Couldn’t change sync preference.')}};
 $('delete-save').onclick=async()=>{
   const r=notes.find(x=>x.id===activeSaveId);if(!r)return;
-  try{const next={...r,deleted:!r.deleted};await storeSave(next);notes=notes.map(x=>x.id===r.id?next:x);$('detail').close();render();notifyLocalChange();toast(next.deleted?'Moved to trash. Restore it from Filters → Trash.':'Save restored')}
+  try{const next={...r,deleted:!r.deleted};await storeSave(next);notes=notes.map(x=>x.id===r.id?next:x);$('detail').close();render();notifyLocalChange();toast(next.deleted?'Moved to trash. Restore it from Trash below the search field.':'Save restored')}
   catch{toast('Couldn’t update that save. Please try again.')}
+};
+async function restoreTrashedSave(id){
+  const r=notes.find(x=>x.id===id&&x.deleted&&!x.redacted);if(!r)return;
+  try{const next={...r,deleted:false};await storeSave(next);notes=notes.map(x=>x.id===id?next:x);render();notifyLocalChange();toast('Restored to '+(categories.find(c=>c.id===r.category)?.name||'Inbox')+'.')}catch{toast('Couldn’t restore this save. Try again.')}
+}
+function eraseSaveContent(record){
+  // Retain only identity and sync ancestry so older devices cannot resurrect this save.
+  return {id:record.id,category:record.category,revision:record.revision,ancestors:record.ancestors,createdAt:record.createdAt,localOnly:record.localOnly,sharedSource:record.sharedSource,deleted:true,redacted:true,title:'',body:'',images:[],media:[],tags:[]};
+}
+const eraseDialog=document.createElement('dialog');eraseDialog.id='erase-save-dialog';eraseDialog.setAttribute('aria-labelledby','erase-save-heading');eraseDialog.innerHTML='<h2 id="erase-save-heading">Delete forever?</h2><p id="erase-save-name"></p><p class="small-note">This removes the save and its attachments from this browser and the next sync. Existing backups and GitHub history keep earlier copies.</p><p id="erase-save-result" role="status"></p><div class="editor-actions"><button type="button" id="cancel-erase-save">Keep in Trash</button><button type="button" id="confirm-erase-save" class="danger-button">Delete forever</button></div>';document.body.append(eraseDialog);let eraseId=null;
+function askEraseSave(id){const r=notes.find(x=>x.id===id&&x.deleted&&!x.redacted);if(!r)return;eraseId=id;$('erase-save-name').textContent=r.metadata?.title||r.title||'Untitled save';$('erase-save-result').textContent='';eraseDialog.showModal()}
+$('cancel-erase-save').onclick=()=>eraseDialog.close();
+$('confirm-erase-save').onclick=async()=>{
+  const r=notes.find(x=>x.id===eraseId&&x.deleted&&!x.redacted);if(!r){eraseDialog.close();return}
+  const button=$('confirm-erase-save');button.disabled=true;
+  try{const next=eraseSaveContent(r);await storeSave(next);for(const file of [...(r.images||[]),...(r.media||[])]){const url=objectURLs.get(file.id);if(url)URL.revokeObjectURL(url);objectURLs.delete(file.id)}notes=notes.map(x=>x.id===r.id?next:x);eraseDialog.close();if(activeSaveId===r.id)$('detail').close();render();notifyLocalChange();toast('Deleted forever.')}catch{$('erase-save-result').textContent='Couldn’t delete. The save is still in Trash.'}finally{button.disabled=false}
 };
 $('edit-save').onclick=()=>{
   const record=notes.find(x=>x.id===activeSaveId);if(!record)return;
@@ -46,11 +62,19 @@ if(localUpdates)localUpdates.onmessage=async()=>{try{notes=(await allLocalRecord
 function broadcastLocalUpdate(){localUpdates?.postMessage('changed')}
 function notifyLocalChange(){broadcastLocalUpdate();if(typeof scheduleSync==='function')scheduleSync();refreshStorageStatus()}
 async function refreshStorageStatus(){
-  const count=notes.filter(n=>!n.deleted).length;$('storage-summary').textContent=`${count} save${count===1?'':'s'} on this device`;
+  const count=notes.filter(n=>!n.deleted&&!n.redacted).length;$('storage-summary').textContent=`${count} save${count===1?'':'s'} on this device`;
   try{const estimate=await navigator.storage?.estimate();if(estimate?.usage)$('storage-summary').textContent+=` · ${(estimate.usage/1048576).toFixed(1)} MB`;}catch{}
 }
-$('storage-settings').onclick=()=>{refreshStorageStatus();$('storage-dialog').showModal()};
-$('protect-storage').onclick=async()=>{try{const granted=await navigator.storage.persist();$('storage-result').textContent=granted?'Persistent browser storage enabled. Keep backups too.':'This browser did not grant persistent storage. Export a backup regularly.'}catch{$('storage-result').textContent='This browser does not support persistent storage.'}};
+$('storage-settings').onclick=()=>{refreshStorageStatus();refreshStorageProtection();$('storage-result').textContent='';$('storage-dialog').showModal()};
+async function refreshStorageProtection(){
+  const button=$('protect-storage'),status=$('storage-protection-status');
+  if(!navigator.storage?.persist||!navigator.storage?.persisted){button.disabled=true;button.textContent='Protection unavailable';status.textContent='This browser cannot protect saves from automatic cleanup. Export a backup to keep a copy.';return}
+  try{const protectedStorage=await navigator.storage.persisted();button.disabled=protectedStorage;button.textContent=protectedStorage?'Storage protected':'Protect browser storage';status.textContent=protectedStorage?'Protected from automatic browser cleanup. Clearing site data still removes saves; keep a backup.':'Standard storage · saves are kept here, but the browser may clear them when space runs low. Click to request protection.'}catch{button.disabled=true;button.textContent='Storage unavailable';status.textContent='Browser storage is unavailable. Try a regular browser window.'}
+}
+$('protect-storage').onclick=async()=>{
+  const button=$('protect-storage');button.disabled=true;button.textContent='Requesting protection…';$('storage-protection-status').textContent='Waiting for this browser’s decision…';
+  try{const granted=await navigator.storage.persist();await refreshStorageProtection();$('storage-result').textContent=granted?'Protection enabled. Your saves stay in this browser.':'Protection wasn’t granted. Your saves are still here; export a backup. You can try again later.'}catch{await refreshStorageProtection();$('storage-result').textContent='Couldn’t request protection. Your saves are unchanged.'}
+};
 function archiveName(name){return String(name||'attachment').replace(/[\\/\x00-\x1f:*?"<>|]/g,'_').slice(0,120)||'attachment'}
 async function buildBackup(){
   const records=await allLocalRecords(),files={},items=[];

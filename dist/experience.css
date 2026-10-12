@@ -147,3 +147,25 @@ dialog .dialog-close{z-index:5;display:grid;place-items:center;top:8px;right:8px
 #capture-form .capture-tools svg{width:24px;height:24px}
 @media(max-width:480px){#capture-form .composer-bottom{padding:5px 10px 12px;gap:6px}#capture-form .save-button{font-size:18px;padding-inline:10px;gap:7px}#capture-form .capture-tools{gap:0}#capture-form .capture-tools button{width:32px;min-width:29px}}
 @media(max-width:350px){#capture-form .save-button{font-size:16px;padding-inline:8px;gap:5px}#capture-form .capture-tools button{width:28px;min-width:26px}}
+
+/* Parent views stay separate from individual crate chips. */
+#category-filter{display:none!important}
+#crate-browse{display:flex;flex-direction:column;gap:12px}
+.browse-views,.browse-crates{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.browse-views{padding-bottom:12px;border-bottom:1px solid var(--line)}
+#crate-browse .browse-views button{background:transparent;border:0;border-radius:0;padding:5px 3px;color:var(--quiet)}
+#crate-browse .browse-views button[aria-pressed=true]{color:var(--text);box-shadow:inset 0 -2px var(--orange)}
+#crate-browse .browse-views button+button{margin-left:auto}
+.browse-views small{font:inherit;font-size:.8em;opacity:.7}
+.trash-actions{display:flex;align-items:center;gap:6px;flex:1;min-width:0}
+.trash-actions button{display:flex;align-items:center;gap:5px;min-height:36px;color:var(--orange);font-size:18px;padding:4px 6px}
+.item:has(.trash-actions) .item-meta{display:none}
+.item:has(.trash-actions) .card-copy{display:none}
+.danger-button{padding:9px 14px;border:1px solid #c98973;color:#f1ad91;border-radius:5px;min-height:44px}
+#storage-protection-status{font-size:18px;line-height:1.45;color:var(--muted)}
+.wheel{scroll-snap-type:none!important;scroll-behavior:auto!important;overflow-anchor:none}
+.wheel-item{scroll-snap-align:none!important;transition:none}
+.item.layout-compact:has(.trash-actions){flex-wrap:wrap}
+.item.layout-compact:has(.trash-actions) .card-main{flex:1 1 100%}
+.item.layout-compact:has(.trash-actions) .card-bottom{flex:1 1 100%;width:100%;max-width:none;min-width:0;padding:8px 12px;gap:12px}
+.item:has(.trash-actions) .card-info{margin-left:auto}
