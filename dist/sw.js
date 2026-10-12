@@ -1,4 +1,4 @@
-const CACHE='pasteinn-core-v6';
+const CACHE='pasteinn-core-v7';
 const SHELL=["font-init.js", "index.html", "landing.html", "landing.css", "landing.js", "concept.html", "inn.css", "experience.css", "experience.js", "surface.js", "menus.js", "speech.js", "speech-worker.mjs", "assets/inn-hand.woff2?v=2", "concept.css", "concept.js", "capture.js", "drawing.js", "local-core.js", "sync.js", "scope.js", "connections.js", "content.js", "sync-protocol.js", "install.js", "vendor/lucide-1.53.0.min.js", "vendor/fflate-0.8.3.min.js", "vendor/ocr/tesseract.min.js", "assets/a-little-space.png", "assets/paste-inn-wordmark.png", "manifest.webmanifest", "assets/app-icon.svg", "assets/app-icon-192.png", "assets/app-icon-512.png", "assets/app-icon-180.png"];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL.map(path=>/\.(css|js)$/.test(path)?path+'?v=20261012-1':path))).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('pasteinn-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
