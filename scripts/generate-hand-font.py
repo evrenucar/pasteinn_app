@@ -4,6 +4,7 @@ from fontTools.fontBuilder import FontBuilder
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.feaLib.builder import addOpenTypeFeaturesFromString
 from pathlib import Path
+from turkish_glyphs import add_turkish_glyphs
 parser=argparse.ArgumentParser(description='Build Inn Hand from the openly licensed Gaegu Bold source.')
 parser.add_argument('source',type=Path);parser.add_argument('license',type=Path);parser.add_argument('output',type=Path)
 args=parser.parse_args();args.output.mkdir(parents=True,exist_ok=True)
@@ -27,5 +28,6 @@ fb=FontBuilder(1000,isTTF=True);fb.setupGlyphOrder(names);fb.setupCharacterMap(d
 fb.setupNameTable({'familyName':'Inn Hand','styleName':'Regular','uniqueFontIdentifier':'PasteInn-InnHand-1','fullName':'Inn Hand Regular','psName':'InnHand-Regular','version':'Version 1.000','copyright':'Copyright 2018 The Gaegu Project Authors; pixel outlines adapted for Paste Inn. Licensed under SIL OFL 1.1.'});fb.setupOS2(sTypoAscender=850,sTypoDescender=-250,usWinAscent=1000,usWinDescent=350);fb.setupPost();fb.setupMaxp()
 # Positive pair spacing gives crowded handwritten pairs room to breathe.
 addOpenTypeFeaturesFromString(fb.font, "feature kern { pos uni0074 uni0068 75; pos uni0054 uni0068 75; pos uni0073 uni0070 75; pos uni0053 uni0070 75; pos uni0074 uni0069 75; pos uni0054 uni0069 75; pos uni0074 uni006F 75; pos uni0054 uni006F 75; } kern;")
+add_turkish_glyphs(fb.font)
 fb.font.flavor='woff2' ;fb.save(args.output/'inn-hand.woff2')
 (args.output/'inn-hand-LICENSE.txt').write_text(args.license.read_text()+'\nInn Hand is a renamed derivative of Gaegu Bold. Latin glyphs rasterized and traced into pixel outlines for Paste Inn.\n')
